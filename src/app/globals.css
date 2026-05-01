@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --white: #f8f6f1;
+  --matcha-light: #d4dfc0;
+  --matcha-mid: #8fa96b;
+  --matcha-deep: #4a5e38;
+  --warm-gold: #c8973a;
+  --charcoal: #1e1e1a;
+  --glass-white: rgba(248, 246, 241, 0.72);
+  --background: var(--white);
+  --foreground: var(--charcoal);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-white: var(--white);
+  --color-matcha-light: var(--matcha-light);
+  --color-matcha-mid: var(--matcha-mid);
+  --color-matcha-deep: var(--matcha-deep);
+  --color-warm-gold: var(--warm-gold);
+  --color-charcoal: var(--charcoal);
+  --font-sans: var(--font-ui);
+  --font-serif: var(--font-body);
+  --font-display: var(--font-display);
+  --font-accent: var(--font-accent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--white);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), serif;
+}
+
+a,
+button {
+  transition:
+    color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--matcha-mid) 28%, white);
+  color: var(--matcha-deep);
+}
+
+.site-shell {
+  background:
+    radial-gradient(circle at top left, rgba(212, 223, 192, 0.55), transparent 28%),
+    linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%234a5e38' fill-opacity='0.06'%3E%3Ccircle cx='12' cy='16' r='1.2'/%3E%3Ccircle cx='64' cy='48' r='1'/%3E%3Ccircle cx='106' cy='22' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.4'/%3E%3Ccircle cx='44' cy='118' r='1.1'/%3E%3Ccircle cx='92' cy='138' r='1.2'/%3E%3Ccircle cx='150' cy='146' r='1'/%3E%3C/g%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+.section-fade {
+  animation: sectionFade 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes sectionFade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
