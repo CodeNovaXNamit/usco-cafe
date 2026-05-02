@@ -32,14 +32,14 @@ export default function HomePage() {
     <SiteShell currentPath="/">
       <FrameSequenceHero />
 
-      <section className="px-4 py-18 sm:px-6 sm:py-24 lg:px-10">
+      <section className="px-4 py-14 sm:px-6 sm:py-24 lg:px-10">
         <SectionIntro
           title="Somewhere between your first sip and your last thought."
           body="USCO is a small place that asks very little of you. Sit. Breathe. Let the coffee do the rest."
         />
       </section>
 
-      <section className="px-4 pb-18 sm:px-6 sm:pb-24 lg:px-10">
+      <section className="px-4 pb-14 sm:px-6 sm:pb-24 lg:px-10">
         <div className="mx-auto grid max-w-7xl gap-4 sm:gap-5 lg:grid-cols-3">
           {pillars.map((pillar) => (
             <article
@@ -54,7 +54,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
+      <section className="px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
             <div>

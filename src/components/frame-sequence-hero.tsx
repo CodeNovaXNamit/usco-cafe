@@ -5,18 +5,59 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFrameAssetUrl, totalFrames } from "@/data/site";
 
+const mobileFrameIndexes = Array.from({ length: 28 }, (_, index) =>
+  Math.round((index * (totalFrames - 1)) / 27),
+);
+
 function getFrameUrl(index: number) {
   return getFrameAssetUrl(index);
+}
+
+function drawCoverImage(canvas: HTMLCanvasElement, image: HTMLImageElement, devicePixelRatio: number) {
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    return;
+  }
+
+  const { width, height } = canvas.getBoundingClientRect();
+  canvas.width = Math.round(width * devicePixelRatio);
+  canvas.height = Math.round(height * devicePixelRatio);
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const imageRatio = image.width / image.height;
+  const canvasRatio = width / height;
+  let drawWidth = width;
+  let drawHeight = height;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  if (imageRatio > canvasRatio) {
+    drawHeight = height;
+    drawWidth = drawHeight * imageRatio;
+    offsetX = (width - drawWidth) / 2;
+  } else {
+    drawWidth = width;
+    drawHeight = drawWidth / imageRatio;
+    offsetY = (height - drawHeight) / 2;
+  }
+
+  ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
 
 export function FrameSequenceHero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [progress, setProgress] = useState(0);
+  const targetProgressRef = useRef(0);
+  const smoothProgressRef = useRef(0);
   const [loadedCount, setLoadedCount] = useState(0);
+  const [mobileLoadedCount, setMobileLoadedCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
+  const mobileImagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const devicePixelRatioRef = useRef(1);
 
   const overlay = useMemo(() => {
@@ -75,34 +116,84 @@ export function FrameSequenceHero() {
       const total = Math.max(container.offsetHeight - window.innerHeight, 1);
       const nextProgress = Math.min(Math.max(-rect.top / total, 0), 1);
 
-      setProgress(nextProgress);
+      targetProgressRef.current = nextProgress;
     };
 
     updateProgress();
-    let frame = 0;
+    let scrollFrame = 0;
+    let animationFrame = 0;
+
+    const animateProgress = () => {
+      const target = targetProgressRef.current;
+      const current = smoothProgressRef.current;
+      const delta = target - current;
+      const next = Math.abs(delta) < 0.001 ? target : current + delta * 0.16;
+
+      smoothProgressRef.current = next;
+      setProgress(next);
+      animationFrame = window.requestAnimationFrame(animateProgress);
+    };
+
     const onScroll = () => {
-      if (frame) {
+      if (scrollFrame) {
         return;
       }
 
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
+      scrollFrame = window.requestAnimationFrame(() => {
+        scrollFrame = 0;
         updateProgress();
       });
     };
 
+    animationFrame = window.requestAnimationFrame(animateProgress);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", updateProgress);
 
     return () => {
-      if (frame) {
-        window.cancelAnimationFrame(frame);
+      if (scrollFrame) {
+        window.cancelAnimationFrame(scrollFrame);
+      }
+
+      if (animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
       }
 
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", updateProgress);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isMobile || reducedMotion) {
+      return;
+    }
+
+    let cancelled = false;
+    let loaded = 0;
+    mobileImagesRef.current = new Array(mobileFrameIndexes.length).fill(null);
+
+    for (const [index, frameIndex] of mobileFrameIndexes.entries()) {
+      const image = new window.Image();
+      image.src = getFrameUrl(frameIndex);
+      image.onload = () => {
+        if (cancelled) {
+          return;
+        }
+
+        mobileImagesRef.current[index] = image;
+        loaded += 1;
+        setMobileLoadedCount(loaded);
+
+        if (loaded === 1 && canvasRef.current) {
+          drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
+        }
+      };
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMobile, reducedMotion]);
 
   useEffect(() => {
     if (isMobile || reducedMotion) {
@@ -112,47 +203,6 @@ export function FrameSequenceHero() {
     let cancelled = false;
     let loaded = 0;
     imagesRef.current = new Array(totalFrames).fill(null);
-
-    const drawFrame = (index: number) => {
-      const canvas = canvasRef.current;
-      const image = imagesRef.current[index];
-
-      if (!canvas || !image) {
-        return;
-      }
-
-      const ctx = canvas.getContext("2d");
-
-      if (!ctx) {
-        return;
-      }
-
-      const { width, height } = canvas.getBoundingClientRect();
-      const devicePixelRatio = devicePixelRatioRef.current;
-      canvas.width = Math.round(width * devicePixelRatio);
-      canvas.height = Math.round(height * devicePixelRatio);
-      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-      ctx.clearRect(0, 0, width, height);
-
-      const imageRatio = image.width / image.height;
-      const canvasRatio = width / height;
-      let drawWidth = width;
-      let drawHeight = height;
-      let offsetX = 0;
-      let offsetY = 0;
-
-      if (imageRatio > canvasRatio) {
-        drawHeight = height;
-        drawWidth = drawHeight * imageRatio;
-        offsetX = (width - drawWidth) / 2;
-      } else {
-        drawWidth = width;
-        drawHeight = drawWidth / imageRatio;
-        offsetY = (height - drawHeight) / 2;
-      }
-
-      ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-    };
 
     for (let index = 0; index < totalFrames; index += 1) {
       const image = new window.Image();
@@ -166,8 +216,8 @@ export function FrameSequenceHero() {
         loaded += 1;
         setLoadedCount(loaded);
 
-        if (loaded === 1) {
-          drawFrame(0);
+        if (loaded === 1 && canvasRef.current) {
+          drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
         }
 
         if (loaded === totalFrames) {
@@ -182,54 +232,32 @@ export function FrameSequenceHero() {
   }, [isMobile, reducedMotion]);
 
   useEffect(() => {
-    if (isMobile || reducedMotion || loadedCount === 0) {
+    if (reducedMotion) {
       return;
     }
 
     const canvas = canvasRef.current;
-    const image = imagesRef.current[Math.min(totalFrames - 1, Math.floor(progress * (totalFrames - 1)))];
+    const image = isMobile
+      ? mobileImagesRef.current[Math.min(mobileFrameIndexes.length - 1, Math.floor(progress * (mobileFrameIndexes.length - 1)))]
+      : imagesRef.current[Math.min(totalFrames - 1, Math.floor(progress * (totalFrames - 1)))];
 
     if (!canvas || !image) {
       return;
     }
 
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) {
-      return;
-    }
-
-    const { width, height } = canvas.getBoundingClientRect();
     const devicePixelRatio = window.devicePixelRatio || 1;
     devicePixelRatioRef.current = devicePixelRatio;
-    canvas.width = Math.round(width * devicePixelRatio);
-    canvas.height = Math.round(height * devicePixelRatio);
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-    ctx.clearRect(0, 0, width, height);
+    drawCoverImage(canvas, image, devicePixelRatio);
+  }, [isMobile, loadedCount, mobileLoadedCount, progress, reducedMotion]);
 
-    const imageRatio = image.width / image.height;
-    const canvasRatio = width / height;
-    let drawWidth = width;
-    let drawHeight = height;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (imageRatio > canvasRatio) {
-      drawHeight = height;
-      drawWidth = drawHeight * imageRatio;
-      offsetX = (width - drawWidth) / 2;
-    } else {
-      drawWidth = width;
-      drawHeight = drawWidth / imageRatio;
-      offsetY = (height - drawHeight) / 2;
-    }
-
-    ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-  }, [isMobile, loadedCount, progress, reducedMotion]);
-
-  const ready = isMobile || reducedMotion || loadedCount >= totalFrames;
+  const ready = reducedMotion || (isMobile ? mobileLoadedCount >= mobileFrameIndexes.length : loadedCount >= totalFrames);
   const loadingProgress = ready ? 100 : Math.round((loadedCount / totalFrames) * 100);
   const isCompactHero = isMobile || reducedMotion;
+  const compactLoadingProgress = reducedMotion
+    ? 100
+    : isMobile
+      ? Math.round((mobileLoadedCount / mobileFrameIndexes.length) * 100)
+      : loadingProgress;
 
   return (
     <section
@@ -246,25 +274,18 @@ export function FrameSequenceHero() {
             <div className="mt-8 h-px w-48 overflow-hidden bg-matcha-light sm:mt-10 sm:w-60">
               <div
                 className="h-full bg-matcha-mid transition-[width] duration-300"
-                style={{ width: `${loadingProgress}%` }}
+                style={{ width: `${compactLoadingProgress}%` }}
               />
             </div>
           </div>
         ) : null}
 
-        {isCompactHero ? (
+        {reducedMotion ? (
           <div className="absolute inset-0">
             <img
               src={getFrameUrl(0)}
               alt="USCO cafe exterior"
               className="absolute inset-0 h-full w-full object-cover"
-              style={{ opacity: 1 - progress * 0.72 }}
-            />
-            <img
-              src={getFrameUrl(totalFrames - 1)}
-              alt="USCO cafe entrance"
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ opacity: 0.18 + progress * 0.82 }}
             />
           </div>
         ) : (
@@ -291,13 +312,13 @@ export function FrameSequenceHero() {
               <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-matcha-mid sm:text-xs">
                 {overlay.kicker}
               </p>
-              <h1 className="mt-3 max-w-3xl text-balance font-display text-[2.6rem] leading-[0.95] text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.18)] sm:mt-4 sm:text-7xl lg:text-[6rem]">
+              <h1 className="mt-3 max-w-3xl text-balance font-display text-[2.35rem] leading-[0.95] text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.18)] sm:mt-4 sm:text-7xl lg:text-[6rem]">
                 {overlay.line}
               </h1>
               <div className="mt-6 flex flex-col items-start gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
                 <Link
                   href="/menu"
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/50 bg-white/20 px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] text-white backdrop-blur hover:scale-[1.02] hover:bg-white/30 sm:px-6 sm:text-xs"
+                  className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/50 bg-white/20 px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] text-white hover:scale-[1.02] hover:bg-white/30 sm:w-auto sm:px-6 sm:text-xs"
                 >
                   {overlay.cta}
                 </Link>
