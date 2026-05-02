@@ -526,11 +526,11 @@ export const adminStats = {
   totalMenuItems: menuItems.length,
   hiddenItems: menuItems.filter((item) => !item.visible).length,
   galleryPhotos: galleryItems.length,
-  updatedAt: "May 1, 2026 · 8:15 PM",
+  updatedAt: "May 1, 2026 / 8:15 PM",
 };
 
 export const priceChangeLog = [
-  ["May 1, 2026 · 9:04 AM", "Flat White", "170 -> 180", "owner@usco.cafe"],
-  ["Apr 27, 2026 · 6:48 PM", "USCO Signature Latte", "210 -> 220", "owner@usco.cafe"],
-  ["Apr 17, 2026 · 11:22 AM", "Hojicha Tonic", "180 -> 190", "owner@usco.cafe"],
+  ["May 1, 2026 / 9:04 AM", "Flat White", "170 -> 180", "owner@usco.cafe"],
+  ["Apr 27, 2026 / 6:48 PM", "USCO Signature Latte", "210 -> 220", "owner@usco.cafe"],
+  ["Apr 17, 2026 / 11:22 AM", "Hojicha Tonic", "180 -> 190", "owner@usco.cafe"],
 ];

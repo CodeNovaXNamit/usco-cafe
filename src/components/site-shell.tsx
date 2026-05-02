@@ -11,8 +11,8 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   return (
     <div className="site-shell min-h-screen text-charcoal">
       <header className="sticky top-0 z-50 border-b border-matcha-light/70 bg-[var(--glass-white)] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-10">
-          <Link href="/" className="font-display text-3xl tracking-[0.08em] text-matcha-deep">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
+          <Link href="/" className="font-display text-[1.9rem] tracking-[0.08em] text-matcha-deep sm:text-3xl">
             USCO
           </Link>
           <nav className="hidden items-center gap-5 font-sans text-[12px] uppercase tracking-[0.3em] text-matcha-deep lg:flex">
@@ -36,19 +36,25 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
             })}
           </nav>
           <div className="hidden font-sans text-[12px] uppercase tracking-[0.2em] text-matcha-mid md:block">
-            Open Today · 8am-8pm
+            Open Today / 8am-8pm
           </div>
-          <details className="lg:hidden">
-            <summary className="cursor-pointer list-none font-sans text-xs uppercase tracking-[0.3em] text-matcha-deep">
+          <details className="relative lg:hidden">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center rounded-full border border-matcha-light bg-white/70 px-4 font-sans text-[11px] uppercase tracking-[0.28em] text-matcha-deep">
               Menu
             </summary>
-            <div className="absolute left-0 right-0 top-full border-b border-matcha-light bg-matcha-deep px-6 py-8 text-white">
+            <div className="absolute right-0 top-[calc(100%+0.75rem)] w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] border border-matcha-light/70 bg-matcha-deep p-6 text-white shadow-[0_24px_80px_rgba(30,30,26,0.22)]">
+              <div className="mb-5 font-sans text-[10px] uppercase tracking-[0.32em] text-matcha-light/80">
+                Coffee + Quiet
+              </div>
               <div className="flex flex-col gap-4 font-display text-4xl">
                 {navLinks.map((link) => (
-                  <Link key={link.href} href={link.href}>
+                  <Link key={link.href} href={link.href} className="leading-none">
                     {link.label}
                   </Link>
                 ))}
+              </div>
+              <div className="mt-6 border-t border-white/12 pt-4 font-sans text-[11px] uppercase tracking-[0.22em] text-matcha-light">
+                Open 8am - 8pm
               </div>
             </div>
           </details>

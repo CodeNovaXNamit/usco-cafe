@@ -49,7 +49,7 @@ export function GalleryExperience({ items: sourceItems }: { items: GalleryItem[]
 
   return (
     <>
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
         {galleryTabs.map((tab) => {
           const active = tab.key === activeTab;
           return (
@@ -57,7 +57,7 @@ export function GalleryExperience({ items: sourceItems }: { items: GalleryItem[]
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`rounded-full border px-4 py-2 font-sans text-xs uppercase tracking-[0.24em] ${
+              className={`rounded-full border px-3 py-2 font-sans text-[11px] uppercase tracking-[0.2em] sm:px-4 sm:text-xs sm:tracking-[0.24em] ${
                 active
                   ? "border-matcha-mid bg-matcha-mid text-white"
                   : "border-matcha-light bg-white/80 text-matcha-deep hover:border-matcha-mid"
@@ -69,7 +69,7 @@ export function GalleryExperience({ items: sourceItems }: { items: GalleryItem[]
         })}
       </div>
 
-      <div className="mt-10 columns-1 gap-4 md:columns-2 xl:columns-3">
+      <div className="mt-8 columns-1 gap-4 sm:mt-10 md:columns-2 xl:columns-3">
         {items.map((item) => (
           <button
             key={item.id}
@@ -84,25 +84,29 @@ export function GalleryExperience({ items: sourceItems }: { items: GalleryItem[]
                 className="h-full w-full object-cover saturate-[0.86] transition duration-700 group-hover:scale-[1.02] group-hover:saturate-100"
               />
             </div>
-            <div className="p-5">
-              <p className="font-sans text-[11px] uppercase tracking-[0.24em] text-matcha-mid">
+            <div className="p-4 sm:p-5">
+              <p className="font-sans text-[10px] uppercase tracking-[0.22em] text-matcha-mid sm:text-[11px] sm:tracking-[0.24em]">
                 {galleryTabs.find((tab) => tab.key === item.category)?.label}
               </p>
-              <h3 className="mt-2 font-display text-3xl text-matcha-deep">{item.title}</h3>
-              <p className="mt-2 text-base leading-7 text-charcoal/75">{item.caption}</p>
+              <h3 className="mt-2 font-display text-[2rem] text-matcha-deep sm:text-3xl">{item.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-charcoal/75 sm:text-base sm:leading-7">{item.caption}</p>
             </div>
           </button>
         ))}
       </div>
 
-      <section className="mt-24 rounded-[36px] border border-matcha-light bg-white/75 p-6 shadow-[0_18px_50px_rgba(74,94,56,0.06)] sm:p-10">
+      <section className="mt-18 rounded-[36px] border border-matcha-light bg-white/75 p-6 shadow-[0_18px_50px_rgba(74,94,56,0.06)] sm:mt-24 sm:p-10">
         <div className="max-w-2xl">
-          <p className="font-sans text-xs uppercase tracking-[0.32em] text-matcha-mid">Frame by Frame</p>
-          <h3 className="mt-3 font-display text-5xl text-matcha-deep">The walk in. As you remember it.</h3>
+          <p className="font-sans text-[11px] uppercase tracking-[0.28em] text-matcha-mid sm:text-xs sm:tracking-[0.32em]">
+            Frame by Frame
+          </p>
+          <h3 className="mt-3 font-display text-[2.7rem] leading-[0.96] text-matcha-deep sm:text-5xl">
+            The walk in. As you remember it.
+          </h3>
         </div>
         <div className="mt-8 flex gap-4 overflow-x-auto pb-2">
           {frameStrip.map((frame) => (
-            <div key={frame.index} className="min-w-56 overflow-hidden rounded-[22px] border border-matcha-light bg-white">
+            <div key={frame.index} className="min-w-48 overflow-hidden rounded-[22px] border border-matcha-light bg-white sm:min-w-56">
               <img
                 src={frame.image}
                 alt={`USCO approach frame ${frame.index}`}
@@ -128,15 +132,17 @@ export function GalleryExperience({ items: sourceItems }: { items: GalleryItem[]
             onClick={(event) => event.stopPropagation()}
           >
             <img src={activeImage.image} alt={activeImage.alt} className="max-h-[70vh] w-full object-cover" />
-            <div className="flex items-start justify-between gap-6 p-6">
+            <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:p-6">
               <div>
-                <h4 className="font-display text-4xl text-matcha-deep">{activeImage.title}</h4>
-                <p className="mt-3 max-w-2xl text-lg leading-8 text-charcoal/80">{activeImage.caption}</p>
+                <h4 className="font-display text-3xl text-matcha-deep sm:text-4xl">{activeImage.title}</h4>
+                <p className="mt-3 max-w-2xl text-base leading-7 text-charcoal/80 sm:text-lg sm:leading-8">
+                  {activeImage.caption}
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveImageId(null)}
-                className="font-sans text-xs uppercase tracking-[0.24em] text-matcha-mid"
+                className="self-start font-sans text-xs uppercase tracking-[0.24em] text-matcha-mid"
               >
                 Close
               </button>

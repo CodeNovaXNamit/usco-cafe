@@ -229,17 +229,21 @@ export function FrameSequenceHero() {
 
   const ready = isMobile || reducedMotion || loadedCount >= totalFrames;
   const loadingProgress = ready ? 100 : Math.round((loadedCount / totalFrames) * 100);
+  const isCompactHero = isMobile || reducedMotion;
 
   return (
-    <section ref={containerRef} className="relative h-[600vh]">
-      <div className="sticky top-0 h-screen overflow-hidden bg-[#f6f3ec]">
+    <section
+      ref={containerRef}
+      className={`relative ${isCompactHero ? "h-[220svh] sm:h-[260svh]" : "h-[420vh] lg:h-[600vh]"}`}
+    >
+      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#f6f3ec]">
         {!ready ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white text-matcha-deep">
-            <div className="font-display text-6xl tracking-[0.12em]">USCO</div>
-            <p className="mt-3 font-accent text-sm uppercase tracking-[0.35em] text-matcha-mid">
+            <div className="px-4 text-center font-display text-5xl tracking-[0.12em] sm:text-6xl">USCO</div>
+            <p className="mt-3 px-4 text-center font-accent text-xs uppercase tracking-[0.35em] text-matcha-mid sm:text-sm">
               Brewing something...
             </p>
-            <div className="mt-10 h-px w-60 overflow-hidden bg-matcha-light">
+            <div className="mt-8 h-px w-48 overflow-hidden bg-matcha-light sm:mt-10 sm:w-60">
               <div
                 className="h-full bg-matcha-mid transition-[width] duration-300"
                 style={{ width: `${loadingProgress}%` }}
@@ -248,62 +252,62 @@ export function FrameSequenceHero() {
           </div>
         ) : null}
 
-        {isMobile || reducedMotion ? (
+        {isCompactHero ? (
           <div className="absolute inset-0">
             <img
               src={getFrameUrl(0)}
               alt="USCO cafe exterior"
               className="absolute inset-0 h-full w-full object-cover"
-              style={{ opacity: 1 - progress * 0.75 }}
+              style={{ opacity: 1 - progress * 0.72 }}
             />
             <img
               src={getFrameUrl(totalFrames - 1)}
               alt="USCO cafe entrance"
               className="absolute inset-0 h-full w-full object-cover"
-              style={{ opacity: 0.2 + progress * 0.8 }}
+              style={{ opacity: 0.18 + progress * 0.82 }}
             />
           </div>
         ) : (
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-white/78 via-white/20 to-black/18" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/82 via-white/18 to-black/26" />
 
-        <div className="absolute left-4 right-4 top-8 flex items-start justify-between sm:left-8 sm:right-8">
+        <div className="absolute left-4 right-4 top-6 flex items-start justify-between sm:left-8 sm:right-8 sm:top-8">
           <div>
-            <div className="font-display text-5xl tracking-[0.08em] text-matcha-deep sm:text-6xl">
-              USCO
-            </div>
-            <div className="font-accent text-xs uppercase tracking-[0.4em] text-matcha-mid sm:text-sm">
+            <div className="font-display text-4xl tracking-[0.08em] text-matcha-deep sm:text-6xl">USCO</div>
+            <div className="font-accent text-[10px] uppercase tracking-[0.38em] text-matcha-mid sm:text-sm">
               Coffee + Quiet
             </div>
           </div>
           <div className="hidden font-sans text-xs uppercase tracking-[0.25em] text-matcha-mid sm:block">
-            No. 4 · Warm light ahead
+            No. 4 / Warm light ahead
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-14 px-4 sm:px-8">
+        <div className="absolute inset-x-0 bottom-8 px-4 sm:bottom-14 sm:px-8">
           <div className="mx-auto max-w-5xl">
-            <p className="font-sans text-xs uppercase tracking-[0.28em] text-matcha-mid">
-              {overlay.kicker}
-            </p>
-            <h1 className="mt-4 max-w-3xl text-balance font-display text-5xl leading-none text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.18)] sm:text-7xl lg:text-[6rem]">
-              {overlay.line}
-            </h1>
-            <div className="mt-8 flex items-center gap-4">
-              <Link
-                href="/menu"
-                className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/20 px-6 py-3 font-sans text-xs uppercase tracking-[0.28em] text-white backdrop-blur hover:scale-[1.02] hover:bg-white/30"
-              >
-                {overlay.cta}
-              </Link>
-              <Link
-                href="/find-us"
-                className="font-sans text-xs uppercase tracking-[0.28em] text-white/80 hover:text-white"
-              >
-                Find Us
-              </Link>
+            <div className="max-w-3xl p-0">
+              <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-matcha-mid sm:text-xs">
+                {overlay.kicker}
+              </p>
+              <h1 className="mt-3 max-w-3xl text-balance font-display text-[2.6rem] leading-[0.95] text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.18)] sm:mt-4 sm:text-7xl lg:text-[6rem]">
+                {overlay.line}
+              </h1>
+              <div className="mt-6 flex flex-col items-start gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
+                <Link
+                  href="/menu"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/50 bg-white/20 px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] text-white backdrop-blur hover:scale-[1.02] hover:bg-white/30 sm:px-6 sm:text-xs"
+                >
+                  {overlay.cta}
+                </Link>
+                <Link
+                  href="/find-us"
+                  className="font-sans text-[11px] uppercase tracking-[0.28em] text-white/85 hover:text-white sm:text-xs"
+                >
+                  Find Us
+                </Link>
+              </div>
             </div>
           </div>
         </div>

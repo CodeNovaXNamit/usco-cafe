@@ -8,7 +8,7 @@ export default async function MenuPage() {
 
   return (
     <SiteShell currentPath="/menu">
-      <section className="px-4 pb-24 pt-18 sm:px-6 lg:px-10">
+      <section className="px-4 pb-18 pt-16 sm:px-6 sm:pb-24 sm:pt-18 lg:px-10">
         <div className="mx-auto max-w-7xl">
           <SectionIntro
             eyebrow="Menu"

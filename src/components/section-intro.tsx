@@ -17,14 +17,14 @@ export function SectionIntro({
   return (
     <div className={`${alignment} section-fade`}>
       {eyebrow ? (
-        <p className="mb-4 font-sans text-xs uppercase tracking-[0.32em] text-matcha-mid">
+        <p className="mb-4 font-sans text-[11px] uppercase tracking-[0.28em] text-matcha-mid sm:text-xs sm:tracking-[0.32em]">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-balance font-display text-5xl leading-none text-matcha-deep sm:text-6xl lg:text-7xl">
+      <h2 className="text-balance font-display text-[2.7rem] leading-[0.94] text-matcha-deep sm:text-6xl lg:text-7xl">
         {title}
       </h2>
-      <p className="mt-6 text-lg leading-8 text-charcoal/80 sm:text-xl">{body}</p>
+      <p className="mt-5 text-base leading-7 text-charcoal/80 sm:mt-6 sm:text-xl sm:leading-8">{body}</p>
     </div>
   );
 }
