@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFrameAssetUrl, totalFrames } from "@/data/site";
 
-const mobileFrameIndexes = Array.from({ length: 28 }, (_, index) =>
-  Math.round((index * (totalFrames - 1)) / 27),
+const mobileFrameIndexes = Array.from({ length: 60 }, (_, index) =>
+  Math.round((index * (totalFrames - 1)) / 59),
 );
 
 function getFrameUrl(index: number) {
@@ -50,8 +50,6 @@ export function FrameSequenceHero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [progress, setProgress] = useState(0);
-  const targetProgressRef = useRef(0);
-  const smoothProgressRef = useRef(0);
   const [loadedCount, setLoadedCount] = useState(0);
   const [mobileLoadedCount, setMobileLoadedCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -116,23 +114,11 @@ export function FrameSequenceHero() {
       const total = Math.max(container.offsetHeight - window.innerHeight, 1);
       const nextProgress = Math.min(Math.max(-rect.top / total, 0), 1);
 
-      targetProgressRef.current = nextProgress;
+      setProgress(nextProgress);
     };
 
     updateProgress();
     let scrollFrame = 0;
-    let animationFrame = 0;
-
-    const animateProgress = () => {
-      const target = targetProgressRef.current;
-      const current = smoothProgressRef.current;
-      const delta = target - current;
-      const next = Math.abs(delta) < 0.001 ? target : current + delta * 0.16;
-
-      smoothProgressRef.current = next;
-      setProgress(next);
-      animationFrame = window.requestAnimationFrame(animateProgress);
-    };
 
     const onScroll = () => {
       if (scrollFrame) {
@@ -145,17 +131,12 @@ export function FrameSequenceHero() {
       });
     };
 
-    animationFrame = window.requestAnimationFrame(animateProgress);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", updateProgress);
 
     return () => {
       if (scrollFrame) {
         window.cancelAnimationFrame(scrollFrame);
-      }
-
-      if (animationFrame) {
-        window.cancelAnimationFrame(animationFrame);
       }
 
       window.removeEventListener("scroll", onScroll);
@@ -262,7 +243,7 @@ export function FrameSequenceHero() {
   return (
     <section
       ref={containerRef}
-      className={`relative ${isCompactHero ? "h-[220svh] sm:h-[260svh]" : "h-[420vh] lg:h-[600vh]"}`}
+      className={`relative ${isCompactHero ? "h-[340svh] sm:h-[380svh]" : "h-[420vh] lg:h-[600vh]"}`}
     >
       <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#f6f3ec]">
         {!ready ? (
