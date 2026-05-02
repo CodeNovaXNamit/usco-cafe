@@ -189,12 +189,6 @@ export function FrameSequenceHero() {
   const devicePixelRatioRef = useRef(1);
   const playbackRef = useRef<number | null>(null);
   const foregroundModeRef = useRef<"dark" | "light">("light");
-  const brandCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const taglineCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const kickerCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const lineCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const asideCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
-
   const overlay = useMemo(() => {
     if (progress < 0.2) {
       return {
@@ -223,14 +217,16 @@ export function FrameSequenceHero() {
   const asideText = "No. 4 / Warm light ahead";
 
   const applyCharacterColors = (
-    refs: React.MutableRefObject<(HTMLSpanElement | null)[]>,
+    group: string,
     setColors: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     if (!canvasRef.current || !textLayerRef.current) {
       return;
     }
 
-    const nextColors = refs.current.map((element) => {
+    const nextColors = Array.from(
+      textLayerRef.current.querySelectorAll<HTMLSpanElement>(`[data-char-group="${group}"]`),
+    ).map((element) => {
       if (!element || element.dataset.space === "true") {
         return "";
       }
@@ -249,22 +245,23 @@ export function FrameSequenceHero() {
 
   const renderCharacterText = (
     text: string,
-    refs: React.MutableRefObject<(HTMLSpanElement | null)[]>,
+    group: string,
     colors: string[],
     className: string,
   ) =>
     text.split("").map((character, index) => (
       <span
         key={`${text}-${index}-${character === " " ? "space" : character}`}
-        ref={(element) => {
-          refs.current[index] = element;
-        }}
+        data-char-group={group}
+        data-char-index={index}
         data-space={character === " " ? "true" : "false"}
         className={`${className} ${character === " " ? "inline-block w-[0.28em]" : colors[index] ?? "text-white"}`}
       >
         {character === " " ? "\u00A0" : character}
       </span>
     ));
+
+  const useCharacterContrast = !isMobile && !reducedMotion;
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 639px)");
@@ -317,11 +314,14 @@ export function FrameSequenceHero() {
           const nextMode = detectForegroundMode(canvasRef.current);
           foregroundModeRef.current = nextMode;
           setForegroundMode(nextMode);
-          applyCharacterColors(brandCharRefs, setBrandColors);
-          applyCharacterColors(taglineCharRefs, setTaglineColors);
-          applyCharacterColors(kickerCharRefs, setKickerColors);
-          applyCharacterColors(lineCharRefs, setLineColors);
-          applyCharacterColors(asideCharRefs, setAsideColors);
+
+          if (useCharacterContrast) {
+            applyCharacterColors("brand", setBrandColors);
+            applyCharacterColors("tagline", setTaglineColors);
+            applyCharacterColors("kicker", setKickerColors);
+            applyCharacterColors("line", setLineColors);
+            applyCharacterColors("aside", setAsideColors);
+          }
         }
       };
     }
@@ -329,7 +329,7 @@ export function FrameSequenceHero() {
     return () => {
       cancelled = true;
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, useCharacterContrast]);
 
   useEffect(() => {
     devicePixelRatioRef.current = window.devicePixelRatio || 1;
@@ -466,12 +466,14 @@ export function FrameSequenceHero() {
       setForegroundMode(nextMode);
     }
 
-    applyCharacterColors(brandCharRefs, setBrandColors);
-    applyCharacterColors(taglineCharRefs, setTaglineColors);
-    applyCharacterColors(kickerCharRefs, setKickerColors);
-    applyCharacterColors(lineCharRefs, setLineColors);
-    applyCharacterColors(asideCharRefs, setAsideColors);
-  }, [isMobile, loadedCount, progress, reducedMotion]);
+    if (useCharacterContrast) {
+      applyCharacterColors("brand", setBrandColors);
+      applyCharacterColors("tagline", setTaglineColors);
+      applyCharacterColors("kicker", setKickerColors);
+      applyCharacterColors("line", setLineColors);
+      applyCharacterColors("aside", setAsideColors);
+    }
+  }, [isMobile, loadedCount, progress, reducedMotion, useCharacterContrast]);
 
   const startSequence = () => {
     if (!isMobile || reducedMotion || sequenceStarted || loadedCount < totalFrames) {
@@ -529,6 +531,9 @@ export function FrameSequenceHero() {
     ? "h-[calc(100svh+5rem)] sm:h-[calc(100svh+88px)]"
     : "h-[420vh] lg:h-[600vh]";
   const usesDarkForeground = foregroundMode === "dark";
+  const primaryTextClass = usesDarkForeground ? "text-matcha-deep" : "text-white";
+  const accentTextClass = usesDarkForeground ? "text-matcha-mid" : "text-white/88";
+  const asideTextClass = usesDarkForeground ? "text-matcha-deep/80" : "text-white/82";
   const buttonClass = usesDarkForeground
     ? "border-matcha-deep/20 bg-white/88 text-matcha-deep hover:bg-white"
     : "border-white/50 bg-white/20 text-white hover:bg-white/30";
@@ -579,20 +584,20 @@ export function FrameSequenceHero() {
           <div className="absolute left-4 right-4 top-6 flex items-start justify-between sm:left-8 sm:right-8 sm:top-8">
           <div>
             <div
-              className="font-display text-4xl tracking-[0.08em] sm:text-6xl"
+              className={`font-display text-4xl tracking-[0.08em] sm:text-6xl ${useCharacterContrast ? "" : primaryTextClass}`}
             >
-              {renderCharacterText("USCO", brandCharRefs, brandColors, "transition-colors duration-300")}
+              {useCharacterContrast ? renderCharacterText("USCO", "brand", brandColors, "transition-colors duration-300") : "USCO"}
             </div>
             <div
-              className="font-accent text-[10px] uppercase tracking-[0.38em] sm:text-sm"
+              className={`font-accent text-[10px] uppercase tracking-[0.38em] sm:text-sm ${useCharacterContrast ? "" : accentTextClass}`}
             >
-              {renderCharacterText(taglineText, taglineCharRefs, taglineColors, "transition-colors duration-300")}
+              {useCharacterContrast ? renderCharacterText(taglineText, "tagline", taglineColors, "transition-colors duration-300") : taglineText}
             </div>
           </div>
           <div
-            className="hidden font-sans text-xs uppercase tracking-[0.25em] sm:block"
+            className={`hidden font-sans text-xs uppercase tracking-[0.25em] sm:block ${useCharacterContrast ? "" : asideTextClass}`}
           >
-            {renderCharacterText(asideText, asideCharRefs, asideColors, "transition-colors duration-300")}
+            {useCharacterContrast ? renderCharacterText(asideText, "aside", asideColors, "transition-colors duration-300") : asideText}
           </div>
         </div>
 
@@ -600,14 +605,14 @@ export function FrameSequenceHero() {
           <div className="mx-auto max-w-5xl">
             <div className="max-w-3xl p-0 pointer-events-auto">
               <p
-                className="font-sans text-[10px] uppercase tracking-[0.28em] sm:text-xs"
+                className={`font-sans text-[10px] uppercase tracking-[0.28em] sm:text-xs ${useCharacterContrast ? "" : accentTextClass}`}
               >
-                {renderCharacterText(overlay.kicker, kickerCharRefs, kickerColors, "transition-colors duration-300")}
+                {useCharacterContrast ? renderCharacterText(overlay.kicker, "kicker", kickerColors, "transition-colors duration-300") : overlay.kicker}
               </p>
               <h1
-                className="mt-3 max-w-3xl text-balance font-display text-[2.35rem] leading-[0.95] sm:mt-4 sm:text-7xl lg:text-[6rem]"
+                className={`mt-3 max-w-3xl text-balance font-display text-[2.35rem] leading-[0.95] sm:mt-4 sm:text-7xl lg:text-[6rem] ${useCharacterContrast ? "" : primaryTextClass}`}
               >
-                {renderCharacterText(overlay.line, lineCharRefs, lineColors, "transition-colors duration-300")}
+                {useCharacterContrast ? renderCharacterText(overlay.line, "line", lineColors, "transition-colors duration-300") : overlay.line}
               </h1>
               <div className="mt-6 flex flex-col items-start gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
                 <Link
