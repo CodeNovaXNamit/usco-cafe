@@ -33,7 +33,7 @@ export type MenuItem = {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number | string;
   category: Exclude<MenuCategory, "all">;
   tags: DietaryTag[];
   visible: boolean;

@@ -3,12 +3,24 @@
 import { useMemo, useState } from "react";
 import { menuTabs, type MenuCategory, type MenuItem } from "@/data/site";
 
-function formatPrice(price: number) {
-  return price === 0 ? "TBD" : `INR ${price}`;
+function formatPrice(price: MenuItem["price"]) {
+  if (price === 0 || price === "0") {
+    return "TBD";
+  }
+
+  if (typeof price === "string") {
+    return price.toUpperCase().includes("INR") ? price : `INR ${price}`;
+  }
+
+  return `INR ${price}`;
 }
 
 export function MenuTabs({ items: sourceItems }: { items: MenuItem[] }) {
   const [activeTab, setActiveTab] = useState<MenuCategory>("all");
+  const availableTabs = useMemo(() => {
+    const categories = new Set(sourceItems.filter((item) => item.visible).map((item) => item.category));
+    return menuTabs.filter((tab) => tab.key === "all" || categories.has(tab.key));
+  }, [sourceItems]);
 
   const items = useMemo(() => {
     const visible = sourceItems.filter((item) => item.visible);
@@ -24,7 +36,7 @@ export function MenuTabs({ items: sourceItems }: { items: MenuItem[] }) {
   return (
     <div className="section-fade">
       <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-        {menuTabs.map((tab) => {
+        {availableTabs.map((tab) => {
           const active = tab.key === activeTab;
           return (
             <button

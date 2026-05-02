@@ -1,8 +1,21 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { MenuItem } from "@/data/site";
 import { getAdminStats, getMenuItems, getPriceChangeLog } from "@/lib/site-content";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getServerSession } from "@/lib/supabase/server";
+
+function formatMenuPrice(price: MenuItem["price"]) {
+  if (price === 0 || price === "0") {
+    return "TBD";
+  }
+
+  if (typeof price === "string") {
+    return price.toUpperCase().includes("INR") ? price : `INR ${price}`;
+  }
+
+  return `INR ${price}`;
+}
 
 export default async function AdminPage() {
   const configured = isSupabaseConfigured();
@@ -85,11 +98,9 @@ export default async function AdminPage() {
                         {item.category}
                       </td>
                       <td className="px-4 py-4 font-sans text-sm uppercase tracking-[0.16em] text-charcoal/70">
-                        ₹{item.price}
+                        {formatMenuPrice(item.price)}
                       </td>
-                      <td className="px-4 py-4 text-sm text-charcoal/70">
-                        {item.tags.join(", ") || "—"}
-                      </td>
+                      <td className="px-4 py-4 text-sm text-charcoal/70">{item.tags.join(", ") || "-"}</td>
                       <td className="px-4 py-4">
                         <span className="rounded-full bg-matcha-light px-3 py-1 font-sans text-[11px] uppercase tracking-[0.2em] text-matcha-deep">
                           {item.visible ? "Visible" : "Hidden"}
@@ -110,7 +121,7 @@ export default async function AdminPage() {
                   <div key={item.id} className="flex items-center justify-between rounded-2xl bg-[#fbfaf6] px-4 py-3">
                     <span className="font-display text-2xl text-matcha-deep">{item.name}</span>
                     <span className="rounded-full border border-matcha-light px-4 py-2 font-sans text-xs uppercase tracking-[0.24em] text-matcha-mid">
-                      ₹{item.price}
+                      {formatMenuPrice(item.price)}
                     </span>
                   </div>
                 ))}

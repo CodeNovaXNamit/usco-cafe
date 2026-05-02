@@ -1,5 +1,7 @@
 import "server-only";
 
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import {
   adminStats as fallbackAdminStats,
   galleryItems as fallbackGalleryItems,
@@ -11,6 +13,9 @@ import {
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type PriceLogEntry = [string, string, string, string];
+type MenuPrice = MenuItem["price"];
+
+const MENU_CSV_PATH = path.join(process.cwd(), "menu", "menu_data.csv");
 
 function mapMenuCategory(category: string): MenuItem["category"] {
   switch (category) {
@@ -22,6 +27,140 @@ function mapMenuCategory(category: string): MenuItem["category"] {
       return "seasonal";
     default:
       return "coffee";
+  }
+}
+
+function mapCsvMenuCategory(category: string): MenuItem["category"] {
+  switch (category.trim().toLowerCase()) {
+    case "hot":
+      return "coffee";
+    case "cold":
+    case "beverages":
+      return "cold-drinks";
+    case "nibbles":
+      return "food-snacks";
+    default:
+      return "coffee";
+  }
+}
+
+function parseCsvLine(line: string) {
+  const columns: string[] = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+
+    if (character === '"') {
+      const nextCharacter = line[index + 1];
+
+      if (insideQuotes && nextCharacter === '"') {
+        current += '"';
+        index += 1;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+
+      continue;
+    }
+
+    if (character === "," && !insideQuotes) {
+      columns.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    current += character;
+  }
+
+  columns.push(current.trim());
+  return columns;
+}
+
+function parseMenuPrice(rawPrice: string): MenuPrice {
+  const normalized = rawPrice.trim();
+
+  if (!normalized) {
+    return 0;
+  }
+
+  if (/^\d+$/.test(normalized)) {
+    return Number(normalized);
+  }
+
+  return normalized;
+}
+
+function slugifyMenuName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/\(.*?\)/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function buildMenuItemDescription(category: string, name: string) {
+  const group = category.trim().toLowerCase();
+
+  if (group === "hot") {
+    return "Hot coffee, quietly served.";
+  }
+
+  if (group === "cold") {
+    return "Cold coffee, built for long afternoons.";
+  }
+
+  if (group === "beverages") {
+    return name.toLowerCase().includes("tea")
+      ? "Tea and house drinks, poured without rush."
+      : "House beverages for the slower side of the day.";
+  }
+
+  if (group === "nibbles") {
+    return "Small plates and cafe bites.";
+  }
+
+  return "";
+}
+
+async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {
+  try {
+    const csv = await readFile(MENU_CSV_PATH, "utf8");
+    const lines = csv
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (lines.length < 2) {
+      return null;
+    }
+
+    const headers = parseCsvLine(lines[0]);
+
+    if (headers.join("|") !== "Category|Item Name|Price") {
+      return null;
+    }
+
+    return lines.slice(1).map((line, index) => {
+      const [category, itemName, price] = parseCsvLine(line) as [string, string, string];
+      const vegan = /\(vegan\)/i.test(itemName);
+      const cleanName = itemName.replace(/\s*\(vegan\)\s*/i, "").trim();
+
+      return {
+        id: `${mapCsvMenuCategory(category)}-${slugifyMenuName(cleanName) || index + 1}`,
+        name: cleanName,
+        description: buildMenuItemDescription(category, cleanName),
+        price: parseMenuPrice(price),
+        category: mapCsvMenuCategory(category),
+        tags: vegan ? (["Vegan"] as MenuItem["tags"]) : [],
+        visible: true,
+        sortOrder: index + 1,
+      } satisfies MenuItem;
+    });
+  } catch {
+    return null;
   }
 }
 
@@ -38,6 +177,12 @@ function mapGalleryCategory(category: string): GalleryItem["category"] {
 }
 
 export async function getMenuItems(): Promise<MenuItem[]> {
+  const csvItems = await readMenuItemsFromCsv();
+
+  if (csvItems && csvItems.length > 0) {
+    return csvItems;
+  }
+
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
