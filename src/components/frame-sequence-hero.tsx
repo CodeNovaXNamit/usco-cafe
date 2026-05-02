@@ -88,18 +88,112 @@ function drawCoverImages(
   ctx.restore();
 }
 
+function detectForegroundMode(canvas: HTMLCanvasElement) {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!ctx) {
+    return "light" as const;
+  }
+
+  const { width, height } = canvas;
+  if (width === 0 || height === 0) {
+    return "light" as const;
+  }
+
+  const sampleSize = 24;
+  const startX = Math.max(Math.floor(width * 0.16), 0);
+  const startY = Math.max(Math.floor(height * 0.14), 0);
+  const sampleWidth = Math.min(sampleSize, Math.max(width - startX, 1));
+  const sampleHeight = Math.min(sampleSize, Math.max(height - startY, 1));
+  const pixels = ctx.getImageData(startX, startY, sampleWidth, sampleHeight).data;
+
+  let totalLuma = 0;
+  let count = 0;
+
+  for (let index = 0; index < pixels.length; index += 16) {
+    const red = pixels[index] ?? 0;
+    const green = pixels[index + 1] ?? 0;
+    const blue = pixels[index + 2] ?? 0;
+    totalLuma += red * 0.299 + green * 0.587 + blue * 0.114;
+    count += 1;
+  }
+
+  const averageLuma = count > 0 ? totalLuma / count : 0;
+  return averageLuma > 150 ? ("dark" as const) : ("light" as const);
+}
+
+function sampleCharacterTone(
+  canvas: HTMLCanvasElement,
+  element: HTMLSpanElement,
+  container: HTMLDivElement,
+) {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!ctx) {
+    return "text-white";
+  }
+
+  const charRect = element.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  const scaleX = canvas.width / Math.max(containerRect.width, 1);
+  const scaleY = canvas.height / Math.max(containerRect.height, 1);
+  const sampleX = Math.max(Math.floor((charRect.left - containerRect.left) * scaleX), 0);
+  const sampleY = Math.max(Math.floor((charRect.top - containerRect.top) * scaleY), 0);
+  const sampleWidth = Math.max(Math.floor(charRect.width * scaleX), 1);
+  const sampleHeight = Math.max(Math.floor(charRect.height * scaleY), 1);
+  const safeWidth = Math.min(sampleWidth, Math.max(canvas.width - sampleX, 1));
+  const safeHeight = Math.min(sampleHeight, Math.max(canvas.height - sampleY, 1));
+  const pixels = ctx.getImageData(sampleX, sampleY, safeWidth, safeHeight).data;
+
+  let totalLuma = 0;
+  let count = 0;
+
+  for (let index = 0; index < pixels.length; index += 16) {
+    const red = pixels[index] ?? 0;
+    const green = pixels[index + 1] ?? 0;
+    const blue = pixels[index + 2] ?? 0;
+    totalLuma += red * 0.299 + green * 0.587 + blue * 0.114;
+    count += 1;
+  }
+
+  const averageLuma = count > 0 ? totalLuma / count : 0;
+
+  if (averageLuma > 170) {
+    return "text-black";
+  }
+
+  if (averageLuma > 100) {
+    return "text-matcha-mid";
+  }
+
+  return "text-white";
+}
+
 export function FrameSequenceHero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const textLayerRef = useRef<HTMLDivElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [sequenceStarted, setSequenceStarted] = useState(false);
   const [sequenceComplete, setSequenceComplete] = useState(false);
+  const [foregroundMode, setForegroundMode] = useState<"dark" | "light">("light");
+  const [brandColors, setBrandColors] = useState<string[]>([]);
+  const [taglineColors, setTaglineColors] = useState<string[]>([]);
+  const [kickerColors, setKickerColors] = useState<string[]>([]);
+  const [lineColors, setLineColors] = useState<string[]>([]);
+  const [asideColors, setAsideColors] = useState<string[]>([]);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const devicePixelRatioRef = useRef(1);
   const playbackRef = useRef<number | null>(null);
+  const foregroundModeRef = useRef<"dark" | "light">("light");
+  const brandCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const taglineCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const kickerCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const lineCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const asideCharRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   const overlay = useMemo(() => {
     if (progress < 0.2) {
@@ -124,6 +218,53 @@ export function FrameSequenceHero() {
       cta: "Explore",
     };
   }, [isMobile, progress]);
+
+  const taglineText = "Coffee + Quiet";
+  const asideText = "No. 4 / Warm light ahead";
+
+  const applyCharacterColors = (
+    refs: React.MutableRefObject<(HTMLSpanElement | null)[]>,
+    setColors: React.Dispatch<React.SetStateAction<string[]>>,
+  ) => {
+    if (!canvasRef.current || !textLayerRef.current) {
+      return;
+    }
+
+    const nextColors = refs.current.map((element) => {
+      if (!element || element.dataset.space === "true") {
+        return "";
+      }
+
+      return sampleCharacterTone(canvasRef.current as HTMLCanvasElement, element, textLayerRef.current as HTMLDivElement);
+    });
+
+    setColors((current) => {
+      if (current.length === nextColors.length && current.every((value, index) => value === nextColors[index])) {
+        return current;
+      }
+
+      return nextColors;
+    });
+  };
+
+  const renderCharacterText = (
+    text: string,
+    refs: React.MutableRefObject<(HTMLSpanElement | null)[]>,
+    colors: string[],
+    className: string,
+  ) =>
+    text.split("").map((character, index) => (
+      <span
+        key={`${text}-${index}-${character === " " ? "space" : character}`}
+        ref={(element) => {
+          refs.current[index] = element;
+        }}
+        data-space={character === " " ? "true" : "false"}
+        className={`${className} ${character === " " ? "inline-block w-[0.28em]" : colors[index] ?? "text-white"}`}
+      >
+        {character === " " ? "\u00A0" : character}
+      </span>
+    ));
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 639px)");
@@ -173,6 +314,14 @@ export function FrameSequenceHero() {
 
         if (loaded === 1 && canvasRef.current) {
           drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
+          const nextMode = detectForegroundMode(canvasRef.current);
+          foregroundModeRef.current = nextMode;
+          setForegroundMode(nextMode);
+          applyCharacterColors(brandCharRefs, setBrandColors);
+          applyCharacterColors(taglineCharRefs, setTaglineColors);
+          applyCharacterColors(kickerCharRefs, setKickerColors);
+          applyCharacterColors(lineCharRefs, setLineColors);
+          applyCharacterColors(asideCharRefs, setAsideColors);
         }
       };
     }
@@ -307,10 +456,21 @@ export function FrameSequenceHero() {
 
     if (isMobile) {
       drawCoverImages(canvas, currentImage, nextImage ?? null, blend, devicePixelRatio);
-      return;
+    } else {
+      drawCoverImage(canvas, currentImage, devicePixelRatio);
     }
 
-    drawCoverImage(canvas, currentImage, devicePixelRatio);
+    const nextMode = detectForegroundMode(canvas);
+    if (nextMode !== foregroundModeRef.current) {
+      foregroundModeRef.current = nextMode;
+      setForegroundMode(nextMode);
+    }
+
+    applyCharacterColors(brandCharRefs, setBrandColors);
+    applyCharacterColors(taglineCharRefs, setTaglineColors);
+    applyCharacterColors(kickerCharRefs, setKickerColors);
+    applyCharacterColors(lineCharRefs, setLineColors);
+    applyCharacterColors(asideCharRefs, setAsideColors);
   }, [isMobile, loadedCount, progress, reducedMotion]);
 
   const startSequence = () => {
@@ -368,6 +528,11 @@ export function FrameSequenceHero() {
   const heroHeightClass = isCompactHero
     ? "h-[calc(100svh+5rem)] sm:h-[calc(100svh+88px)]"
     : "h-[420vh] lg:h-[600vh]";
+  const usesDarkForeground = foregroundMode === "dark";
+  const buttonClass = usesDarkForeground
+    ? "border-matcha-deep/20 bg-white/88 text-matcha-deep hover:bg-white"
+    : "border-white/50 bg-white/20 text-white hover:bg-white/30";
+  const secondaryLinkClass = usesDarkForeground ? "text-matcha-deep/80 hover:text-matcha-deep" : "text-white/85 hover:text-white";
 
   return (
     <section
@@ -407,37 +572,53 @@ export function FrameSequenceHero() {
 
         <div className="absolute inset-0 bg-gradient-to-b from-white/82 via-white/18 to-black/26" />
 
-        <div className="absolute left-4 right-4 top-6 flex items-start justify-between sm:left-8 sm:right-8 sm:top-8">
+        <div
+          ref={textLayerRef}
+          className="absolute inset-0 pointer-events-none"
+        >
+          <div className="absolute left-4 right-4 top-6 flex items-start justify-between sm:left-8 sm:right-8 sm:top-8">
           <div>
-            <div className="font-display text-4xl tracking-[0.08em] text-matcha-deep sm:text-6xl">USCO</div>
-            <div className="font-accent text-[10px] uppercase tracking-[0.38em] text-matcha-mid sm:text-sm">
-              Coffee + Quiet
+            <div
+              className="font-display text-4xl tracking-[0.08em] sm:text-6xl"
+            >
+              {renderCharacterText("USCO", brandCharRefs, brandColors, "transition-colors duration-300")}
+            </div>
+            <div
+              className="font-accent text-[10px] uppercase tracking-[0.38em] sm:text-sm"
+            >
+              {renderCharacterText(taglineText, taglineCharRefs, taglineColors, "transition-colors duration-300")}
             </div>
           </div>
-          <div className="hidden font-sans text-xs uppercase tracking-[0.25em] text-matcha-mid sm:block">
-            No. 4 / Warm light ahead
+          <div
+            className="hidden font-sans text-xs uppercase tracking-[0.25em] sm:block"
+          >
+            {renderCharacterText(asideText, asideCharRefs, asideColors, "transition-colors duration-300")}
           </div>
         </div>
 
         <div className="absolute inset-x-0 bottom-8 px-4 sm:bottom-14 sm:px-8">
           <div className="mx-auto max-w-5xl">
-            <div className="max-w-3xl p-0">
-              <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-matcha-mid sm:text-xs">
-                {overlay.kicker}
+            <div className="max-w-3xl p-0 pointer-events-auto">
+              <p
+                className="font-sans text-[10px] uppercase tracking-[0.28em] sm:text-xs"
+              >
+                {renderCharacterText(overlay.kicker, kickerCharRefs, kickerColors, "transition-colors duration-300")}
               </p>
-              <h1 className="mt-3 max-w-3xl text-balance font-display text-[2.35rem] leading-[0.95] text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.18)] sm:mt-4 sm:text-7xl lg:text-[6rem]">
-                {overlay.line}
+              <h1
+                className="mt-3 max-w-3xl text-balance font-display text-[2.35rem] leading-[0.95] sm:mt-4 sm:text-7xl lg:text-[6rem]"
+              >
+                {renderCharacterText(overlay.line, lineCharRefs, lineColors, "transition-colors duration-300")}
               </h1>
               <div className="mt-6 flex flex-col items-start gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
                 <Link
                   href="/menu"
-                  className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/50 bg-white/20 px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] text-white hover:scale-[1.02] hover:bg-white/30 sm:w-auto sm:px-6 sm:text-xs"
+                  className={`inline-flex min-h-11 w-full items-center justify-center rounded-full border px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] transition-[transform,color,background-color,border-color] duration-300 hover:scale-[1.02] sm:w-auto sm:px-6 sm:text-xs ${buttonClass}`}
                 >
                   {isMobile && sequenceComplete ? "Explore" : overlay.cta}
                 </Link>
                 <Link
                   href="/find-us"
-                  className="font-sans text-[11px] uppercase tracking-[0.28em] text-white/85 hover:text-white sm:text-xs"
+                  className={`font-sans text-[11px] uppercase tracking-[0.28em] transition-colors duration-300 sm:text-xs ${secondaryLinkClass}`}
                 >
                   Find Us
                 </Link>
@@ -445,13 +626,22 @@ export function FrameSequenceHero() {
               <button
                 type="button"
                 onClick={scrollStep}
-                className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/35 bg-black/12 px-4 py-2 font-sans text-[10px] uppercase tracking-[0.3em] text-white/88 hover:bg-black/20 sm:mt-6 sm:text-[11px]"
+                className={`mt-5 inline-flex min-h-10 items-center gap-2 rounded-full border px-4 py-2 font-sans text-[10px] uppercase tracking-[0.3em] transition-[color,background-color,border-color] duration-300 sm:mt-6 sm:text-[11px] ${
+                  usesDarkForeground
+                    ? "border-matcha-deep/20 bg-white/82 text-matcha-deep hover:bg-white"
+                    : "border-white/35 bg-black/12 text-white/88 hover:bg-black/20"
+                }`}
               >
                 <span>{isMobile && !sequenceStarted ? "Start" : "Scroll"}</span>
-                <span className="hero-scroll-cue block h-3.5 w-3.5 rounded-full border border-white/55" />
+                <span
+                  className={`hero-scroll-cue block h-3.5 w-3.5 rounded-full ${
+                    usesDarkForeground ? "border border-matcha-deep/35" : "border border-white/55"
+                  }`}
+                />
               </button>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>
