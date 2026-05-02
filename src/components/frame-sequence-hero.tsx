@@ -2,12 +2,11 @@
 "use client";
 
 import Link from "next/link";
+import type { TouchEvent as ReactTouchEvent, WheelEvent as ReactWheelEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFrameAssetUrl, totalFrames } from "@/data/site";
 
-const mobileFrameIndexes = Array.from({ length: 60 }, (_, index) =>
-  Math.round((index * (totalFrames - 1)) / 59),
-);
+const mobilePlaybackDurationMs = 4000;
 
 function getFrameUrl(index: number) {
   return getFrameAssetUrl(index);
@@ -46,24 +45,68 @@ function drawCoverImage(canvas: HTMLCanvasElement, image: HTMLImageElement, devi
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
 
+function drawCoverImages(
+  canvas: HTMLCanvasElement,
+  currentImage: HTMLImageElement,
+  nextImage: HTMLImageElement | null,
+  blend: number,
+  devicePixelRatio: number,
+) {
+  drawCoverImage(canvas, currentImage, devicePixelRatio);
+
+  if (!nextImage || blend <= 0) {
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    return;
+  }
+
+  const { width, height } = canvas.getBoundingClientRect();
+  const imageRatio = nextImage.width / nextImage.height;
+  const canvasRatio = width / height;
+  let drawWidth = width;
+  let drawHeight = height;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  if (imageRatio > canvasRatio) {
+    drawHeight = height;
+    drawWidth = drawHeight * imageRatio;
+    offsetX = (width - drawWidth) / 2;
+  } else {
+    drawWidth = width;
+    drawHeight = drawWidth / imageRatio;
+    offsetY = (height - drawHeight) / 2;
+  }
+
+  ctx.save();
+  ctx.globalAlpha = blend;
+  ctx.drawImage(nextImage, offsetX, offsetY, drawWidth, drawHeight);
+  ctx.restore();
+}
+
 export function FrameSequenceHero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
-  const [mobileLoadedCount, setMobileLoadedCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [sequenceStarted, setSequenceStarted] = useState(false);
+  const [sequenceComplete, setSequenceComplete] = useState(false);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
-  const mobileImagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const devicePixelRatioRef = useRef(1);
+  const playbackRef = useRef<number | null>(null);
 
   const overlay = useMemo(() => {
     if (progress < 0.2) {
       return {
         kicker: "Coffee + Quiet",
         line: "A narrow door. A warm light. Come in.",
-        cta: "Scroll slowly",
+        cta: isMobile ? "Begin" : "Scroll slowly",
       };
     }
 
@@ -71,7 +114,7 @@ export function FrameSequenceHero() {
       return {
         kicker: "Somewhere between your first sip and your last thought.",
         line: "The walk in becomes part of the ritual.",
-        cta: "Keep going",
+        cta: isMobile ? "Playing" : "Keep going",
       };
     }
 
@@ -80,14 +123,21 @@ export function FrameSequenceHero() {
       line: "The door is usually open.",
       cta: "Explore",
     };
-  }, [progress]);
+  }, [isMobile, progress]);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 639px)");
     const motionMedia = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updateMedia = () => {
-      setIsMobile(media.matches);
+      const nextIsMobile = media.matches;
+      setIsMobile(nextIsMobile);
       setReducedMotion(motionMedia.matches);
+
+      if (!nextIsMobile) {
+        setSequenceStarted(false);
+        setSequenceComplete(false);
+        setProgress(0);
+      }
     };
 
     updateMedia();
@@ -101,7 +151,43 @@ export function FrameSequenceHero() {
   }, []);
 
   useEffect(() => {
+    if (reducedMotion) {
+      return;
+    }
+
+    let cancelled = false;
+    let loaded = 0;
+    imagesRef.current = new Array(totalFrames).fill(null);
+
+    for (let index = 0; index < totalFrames; index += 1) {
+      const image = new window.Image();
+      image.src = getFrameUrl(index);
+      image.onload = () => {
+        if (cancelled) {
+          return;
+        }
+
+        imagesRef.current[index] = image;
+        loaded += 1;
+        setLoadedCount(loaded);
+
+        if (loaded === 1 && canvasRef.current) {
+          drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
+        }
+      };
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reducedMotion]);
+
+  useEffect(() => {
     devicePixelRatioRef.current = window.devicePixelRatio || 1;
+
+    if (isMobile || reducedMotion) {
+      return;
+    }
 
     const updateProgress = () => {
       const container = containerRef.current;
@@ -142,75 +228,58 @@ export function FrameSequenceHero() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", updateProgress);
     };
-  }, []);
-
-  useEffect(() => {
-    if (!isMobile || reducedMotion) {
-      return;
-    }
-
-    let cancelled = false;
-    let loaded = 0;
-    mobileImagesRef.current = new Array(mobileFrameIndexes.length).fill(null);
-
-    for (const [index, frameIndex] of mobileFrameIndexes.entries()) {
-      const image = new window.Image();
-      image.src = getFrameUrl(frameIndex);
-      image.onload = () => {
-        if (cancelled) {
-          return;
-        }
-
-        mobileImagesRef.current[index] = image;
-        loaded += 1;
-        setMobileLoadedCount(loaded);
-
-        if (loaded === 1 && canvasRef.current) {
-          drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
-        }
-      };
-    }
-
-    return () => {
-      cancelled = true;
-    };
   }, [isMobile, reducedMotion]);
 
   useEffect(() => {
-    if (isMobile || reducedMotion) {
+    if (!isMobile || reducedMotion || !sequenceStarted || sequenceComplete) {
       return;
     }
 
-    let cancelled = false;
-    let loaded = 0;
-    imagesRef.current = new Array(totalFrames).fill(null);
+    const startTime = performance.now();
 
-    for (let index = 0; index < totalFrames; index += 1) {
-      const image = new window.Image();
-      image.src = getFrameUrl(index);
-      image.onload = () => {
-        if (cancelled) {
-          return;
-        }
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const nextProgress = Math.min(elapsed / mobilePlaybackDurationMs, 1);
+      setProgress(nextProgress);
 
-        imagesRef.current[index] = image;
-        loaded += 1;
-        setLoadedCount(loaded);
+      if (nextProgress >= 1) {
+        setSequenceComplete(true);
+        playbackRef.current = null;
+        return;
+      }
 
-        if (loaded === 1 && canvasRef.current) {
-          drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
-        }
+      playbackRef.current = window.requestAnimationFrame(tick);
+    };
 
-        if (loaded === totalFrames) {
-          setLoadedCount(totalFrames);
-        }
-      };
-    }
+    playbackRef.current = window.requestAnimationFrame(tick);
 
     return () => {
-      cancelled = true;
+      if (playbackRef.current) {
+        window.cancelAnimationFrame(playbackRef.current);
+        playbackRef.current = null;
+      }
     };
-  }, [isMobile, reducedMotion]);
+  }, [isMobile, reducedMotion, sequenceComplete, sequenceStarted]);
+
+  useEffect(() => {
+    if (!isMobile || reducedMotion || sequenceComplete || !sequenceStarted) {
+      return;
+    }
+
+    const lockScroll = (event: Event) => {
+      event.preventDefault();
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("wheel", lockScroll, { passive: false });
+    window.addEventListener("touchmove", lockScroll, { passive: false });
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("wheel", lockScroll);
+      window.removeEventListener("touchmove", lockScroll);
+    };
+  }, [isMobile, reducedMotion, sequenceComplete, sequenceStarted]);
 
   useEffect(() => {
     if (reducedMotion) {
@@ -218,34 +287,94 @@ export function FrameSequenceHero() {
     }
 
     const canvas = canvasRef.current;
-    const image = isMobile
-      ? mobileImagesRef.current[Math.min(mobileFrameIndexes.length - 1, Math.floor(progress * (mobileFrameIndexes.length - 1)))]
-      : imagesRef.current[Math.min(totalFrames - 1, Math.floor(progress * (totalFrames - 1)))];
 
-    if (!canvas || !image) {
+    if (!canvas) {
       return;
     }
 
     const devicePixelRatio = window.devicePixelRatio || 1;
     devicePixelRatioRef.current = devicePixelRatio;
-    drawCoverImage(canvas, image, devicePixelRatio);
-  }, [isMobile, loadedCount, mobileLoadedCount, progress, reducedMotion]);
 
-  const ready = reducedMotion || (isMobile ? mobileLoadedCount >= mobileFrameIndexes.length : loadedCount >= totalFrames);
+    const exactFrame = progress * (totalFrames - 1);
+    const currentIndex = Math.floor(exactFrame);
+    const blend = exactFrame - currentIndex;
+    const currentImage = imagesRef.current[Math.min(currentIndex, totalFrames - 1)];
+    const nextImage = imagesRef.current[Math.min(currentIndex + 1, totalFrames - 1)];
+
+    if (!currentImage) {
+      return;
+    }
+
+    if (isMobile) {
+      drawCoverImages(canvas, currentImage, nextImage ?? null, blend, devicePixelRatio);
+      return;
+    }
+
+    drawCoverImage(canvas, currentImage, devicePixelRatio);
+  }, [isMobile, loadedCount, progress, reducedMotion]);
+
+  const startSequence = () => {
+    if (!isMobile || reducedMotion || sequenceStarted || loadedCount < totalFrames) {
+      return;
+    }
+
+    setSequenceStarted(true);
+    setSequenceComplete(false);
+    setProgress(0);
+  };
+
+  const scrollStep = () => {
+    if (isMobile && !sequenceStarted) {
+      startSequence();
+      return;
+    }
+
+    window.scrollBy({
+      top: Math.max(window.innerHeight * (isMobile ? 0.72 : 0.88), 320),
+      behavior: "smooth",
+    });
+  };
+
+  const handleInitialMobileWheel = (event: ReactWheelEvent<HTMLElement>) => {
+    if (!isMobile || reducedMotion || sequenceStarted) {
+      return;
+    }
+
+    event.preventDefault();
+    startSequence();
+  };
+
+  const handleInitialMobileTouchStart = (event: ReactTouchEvent<HTMLElement>) => {
+    if (!isMobile || reducedMotion || sequenceStarted) {
+      return;
+    }
+
+    event.preventDefault();
+    startSequence();
+  };
+
+  const handleInitialMobileTouchMove = (event: ReactTouchEvent<HTMLElement>) => {
+    if (!isMobile || reducedMotion || sequenceStarted) {
+      return;
+    }
+
+    event.preventDefault();
+    startSequence();
+  };
+
+  const ready = reducedMotion || loadedCount >= totalFrames;
   const loadingProgress = ready ? 100 : Math.round((loadedCount / totalFrames) * 100);
   const isCompactHero = isMobile || reducedMotion;
-  const compactLoadingProgress = reducedMotion
-    ? 100
-    : isMobile
-      ? Math.round((mobileLoadedCount / mobileFrameIndexes.length) * 100)
-      : loadingProgress;
 
   return (
     <section
       ref={containerRef}
-      className={`relative ${isCompactHero ? "h-[340svh] sm:h-[380svh]" : "h-[420vh] lg:h-[600vh]"}`}
+      onWheel={handleInitialMobileWheel}
+      onTouchStart={handleInitialMobileTouchStart}
+      onTouchMove={handleInitialMobileTouchMove}
+      className={`relative ${isCompactHero ? "h-[500svh] sm:h-[520svh]" : "h-[420vh] lg:h-[600vh]"}`}
     >
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#f6f3ec]">
+      <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden bg-[#f6f3ec] sm:top-[72px] sm:h-[calc(100svh-72px)]">
         {!ready ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white text-matcha-deep">
             <div className="px-4 text-center font-display text-5xl tracking-[0.12em] sm:text-6xl">USCO</div>
@@ -255,7 +384,7 @@ export function FrameSequenceHero() {
             <div className="mt-8 h-px w-48 overflow-hidden bg-matcha-light sm:mt-10 sm:w-60">
               <div
                 className="h-full bg-matcha-mid transition-[width] duration-300"
-                style={{ width: `${compactLoadingProgress}%` }}
+                style={{ width: `${loadingProgress}%` }}
               />
             </div>
           </div>
@@ -301,7 +430,7 @@ export function FrameSequenceHero() {
                   href="/menu"
                   className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/50 bg-white/20 px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] text-white hover:scale-[1.02] hover:bg-white/30 sm:w-auto sm:px-6 sm:text-xs"
                 >
-                  {overlay.cta}
+                  {isMobile && sequenceComplete ? "Explore" : overlay.cta}
                 </Link>
                 <Link
                   href="/find-us"
@@ -310,6 +439,14 @@ export function FrameSequenceHero() {
                   Find Us
                 </Link>
               </div>
+              <button
+                type="button"
+                onClick={scrollStep}
+                className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/35 bg-black/12 px-4 py-2 font-sans text-[10px] uppercase tracking-[0.3em] text-white/88 hover:bg-black/20 sm:mt-6 sm:text-[11px]"
+              >
+                <span>{isMobile && !sequenceStarted ? "Start" : "Scroll"}</span>
+                <span className="hero-scroll-cue block h-3.5 w-3.5 rounded-full border border-white/55" />
+              </button>
             </div>
           </div>
         </div>

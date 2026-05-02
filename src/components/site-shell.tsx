@@ -10,8 +10,8 @@ type SiteShellProps = {
 export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   return (
     <div className="site-shell min-h-screen text-charcoal">
-      <header className="sticky top-0 z-50 border-b border-matcha-light/70 bg-[var(--glass-white)] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 sm:py-4 lg:px-10">
+      <header className="sticky top-0 z-50 h-16 border-b border-matcha-light/70 bg-[var(--glass-white)] backdrop-blur-xl sm:h-[72px]">
+        <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
           <Link href="/" className="font-display text-[1.9rem] tracking-[0.08em] text-matcha-deep sm:text-3xl">
             USCO
           </Link>
