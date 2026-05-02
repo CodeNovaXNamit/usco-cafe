@@ -365,6 +365,9 @@ export function FrameSequenceHero() {
   const ready = reducedMotion || loadedCount >= totalFrames;
   const loadingProgress = ready ? 100 : Math.round((loadedCount / totalFrames) * 100);
   const isCompactHero = isMobile || reducedMotion;
+  const heroHeightClass = isCompactHero
+    ? "h-[calc(100svh+5rem)] sm:h-[calc(100svh+88px)]"
+    : "h-[420vh] lg:h-[600vh]";
 
   return (
     <section
@@ -372,7 +375,7 @@ export function FrameSequenceHero() {
       onWheel={handleInitialMobileWheel}
       onTouchStart={handleInitialMobileTouchStart}
       onTouchMove={handleInitialMobileTouchMove}
-      className={`relative ${isCompactHero ? "h-[500svh] sm:h-[520svh]" : "h-[420vh] lg:h-[600vh]"}`}
+      className={`relative ${heroHeightClass}`}
     >
       <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden bg-[#f6f3ec] sm:top-[72px] sm:h-[calc(100svh-72px)]">
         {!ready ? (

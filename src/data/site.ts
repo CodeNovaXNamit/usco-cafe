@@ -519,7 +519,7 @@ export const findUs = {
   ],
   instagram: "@usco.cafe",
   mapUrl:
-    "https://www.google.com/maps?q=Shop+Number+4,+Shahpur+Jat,+Siri+Fort,+New+Delhi,+Delhi+110049&output=embed",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.3424860495943!2d77.2164567!3d28.547473399999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce34ee3b5c2d5%3A0xc861a88ed99ee032!2sUSCO%20CAFE!5e1!3m2!1sen!2sin!4v1777708200413!5m2!1sen!2sin",
 };
 
 export const adminStats = {
