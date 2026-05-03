@@ -81,9 +81,17 @@ button {
 }
 
 .site-shell.inner-page-shell {
-  background:
-    url("/background/laptop-bg.png") center center / cover no-repeat fixed,
-    linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
+  position: relative;
+  isolation: isolate;
+}
+
+.site-shell.inner-page-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url("/background/laptop-bg.png") center center / cover no-repeat;
+  pointer-events: none;
 }
 
 .text-balance {
@@ -250,10 +258,8 @@ button {
 }
 
 @media (max-width: 767px) {
-  .site-shell.inner-page-shell {
-    background:
-      url("/background/phone-bg.png") center center / cover no-repeat fixed,
-      linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
+  .site-shell.inner-page-shell::before {
+    background: url("/background/phone-bg.png") center center / cover no-repeat;
   }
 }
 
