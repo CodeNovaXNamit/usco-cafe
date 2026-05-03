@@ -311,6 +311,82 @@ export const menuItems: MenuItem[] = [
   },
 ];
 
+export type HomeOfferingStripItem = {
+  id: string;
+  name: string;
+  image: string;
+  href: string;
+};
+
+export const homeOfferingStripItems: HomeOfferingStripItem[] = [
+  {
+    id: "espresso",
+    name: "Espresso",
+    image: "/showflow/espresso.png",
+    href: "/menu",
+  },
+  {
+    id: "americano",
+    name: "Americano",
+    image: "/showflow/americano.png",
+    href: "/menu",
+  },
+  {
+    id: "shakerato",
+    name: "Shakerato",
+    image: "/showflow/shakerato.png",
+    href: "/menu",
+  },
+  {
+    id: "cappuccino",
+    name: "Cappuccino",
+    image: "/showflow/cappuccino.png",
+    href: "/menu",
+  },
+  {
+    id: "hot-latte",
+    name: "Hot Latte",
+    image: "/showflow/hot-latte.png",
+    href: "/menu",
+  },
+  {
+    id: "hot-matcha",
+    name: "Hot Matcha",
+    image: "/showflow/hot-matcha.png",
+    href: "/menu",
+  },
+  {
+    id: "masala-chai",
+    name: "Masala Chai",
+    image: "/showflow/masala-chai.png",
+    href: "/menu",
+  },
+  {
+    id: "croissant-with-butter",
+    name: "Croissant With Butter",
+    image: "/showflow/croissant-with-butter.png",
+    href: "/menu",
+  },
+  {
+    id: "iced-matcha-latte",
+    name: "Iced Matcha Latte",
+    image: "/showflow/iced-matcha-latte.png",
+    href: "/menu",
+  },
+  {
+    id: "vietnamese-cold-coffee",
+    name: "Vietnamese Cold Coffee",
+    image: "/showflow/vietnamese-cold-coffee.png",
+    href: "/menu",
+  },
+  {
+    id: "chilli-cheese-toast",
+    name: "Chilli Cheese Toast",
+    image: "/showflow/chilli-cheese-toast.png",
+    href: "/menu",
+  },
+];
+
 export type SpecialityItem = {
   id: string;
   name: string;

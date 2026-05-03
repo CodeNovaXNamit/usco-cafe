@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { FrameSequenceHero } from "@/components/frame-sequence-hero";
+import { HomeOfferingStrip } from "@/components/home-offering-strip";
 import { IconMark } from "@/components/icon-mark";
 import { SectionIntro } from "@/components/section-intro";
 import { SiteShell } from "@/components/site-shell";
-import { galleryItems, pillars } from "@/data/site";
+import { galleryItems, homeOfferingStripItems, pillars } from "@/data/site";
 
 export default function HomePage() {
   const teaserCards = [
@@ -53,6 +54,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <HomeOfferingStrip items={homeOfferingStripItems} />
 
       <section className="px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
         <div className="mx-auto max-w-7xl">
