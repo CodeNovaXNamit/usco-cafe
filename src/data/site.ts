@@ -35,6 +35,7 @@ export type MenuItem = {
   description: string;
   price: number | string;
   category: Exclude<MenuCategory, "all">;
+  image?: string;
   tags: DietaryTag[];
   visible: boolean;
   sortOrder: number;

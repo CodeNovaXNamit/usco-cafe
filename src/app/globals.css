@@ -62,6 +62,30 @@ button {
     linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
 }
 
+.inner-page-surface {
+  position: relative;
+  isolation: isolate;
+}
+
+.inner-page-surface::before {
+  content: none;
+}
+
+.inner-page-surface::after {
+  content: none;
+}
+
+.inner-page-surface > * {
+  position: relative;
+  z-index: 1;
+}
+
+.site-shell.inner-page-shell {
+  background:
+    url("/background/laptop-bg.png") center center / cover no-repeat fixed,
+    linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
+}
+
 .text-balance {
   text-wrap: balance;
 }
@@ -122,6 +146,30 @@ button {
 
 .home-offering-track-right {
   animation: offeringMarqueeRight 30s linear infinite;
+}
+
+.menu-price-line {
+  display: inline-flex;
+  width: fit-content;
+  align-items: baseline;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(143, 169, 107, 0.34);
+  padding-bottom: 0.35rem;
+}
+
+.menu-price-line__label {
+  font-family: var(--font-ui), sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(74, 94, 56, 0.72);
+}
+
+.menu-price-line__value {
+  font-family: var(--font-display), serif;
+  font-size: 1.55rem;
+  line-height: 1;
+  color: var(--matcha-deep);
 }
 
 @keyframes heroScrollCue {
@@ -198,6 +246,14 @@ button {
 
   .home-offering-item {
     width: 144px;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-shell.inner-page-shell {
+    background:
+      url("/background/phone-bg.png") center center / cover no-repeat fixed,
+      linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
   }
 }
 

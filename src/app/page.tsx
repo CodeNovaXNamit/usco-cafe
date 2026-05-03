@@ -12,7 +12,7 @@ export default function HomePage() {
     {
       href: "/menu",
       title: "Menu",
-      image: galleryItems[2]?.image,
+      image: "/home/menu-cover.png",
       blurb: "Carefully chosen. Quietly served.",
     },
     {

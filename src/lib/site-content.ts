@@ -16,6 +16,19 @@ type PriceLogEntry = [string, string, string, string];
 type MenuPrice = MenuItem["price"];
 
 const MENU_CSV_PATH = path.join(process.cwd(), "menu", "menu_data.csv");
+const MENU_IMAGE_DIR = path.join(process.cwd(), "public", "menu-items");
+
+const MENU_IMAGE_ALIASES: Record<string, string> = {
+  "anandini-tea": "anandini-tea",
+  "anandini-tea-gulposh-firdaus-pinewood": "anandini-tea",
+  "coconut-and-jaggery-iced-latte": "coconut-and-jaggery-iced-latte",
+  "corn-chilli-cheese-toast": "corn-chilli-toast",
+  "fresh-coconut-americano": "fres-cocunut-americano",
+  "fresh-lemonade-water-or-soda": "lemonade-water-or-soda",
+  "orange-americano": "orange-amricano",
+  "regular-fries-peri-peri-fries": "regular-fries-peri-peri-fries",
+  "sweet-lime-juice-mosambi": "sweet-lime-juice",
+};
 
 function mapMenuCategory(category: string): MenuItem["category"] {
   switch (category) {
@@ -101,6 +114,19 @@ function slugifyMenuName(name: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+async function getMenuImagePath(name: string) {
+  const slug = slugifyMenuName(name);
+  const imageSlug = MENU_IMAGE_ALIASES[slug] ?? slug;
+  const imagePath = path.join(MENU_IMAGE_DIR, `${imageSlug}.png`);
+
+  try {
+    await readFile(imagePath);
+    return `/menu-items/${imageSlug}.png`;
+  } catch {
+    return undefined;
+  }
+}
+
 function buildMenuItemDescription(category: string, name: string) {
   const group = category.trim().toLowerCase();
 
@@ -143,7 +169,8 @@ async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {
       return null;
     }
 
-    return lines.slice(1).map((line, index) => {
+    return Promise.all(
+      lines.slice(1).map(async (line, index) => {
       const [category, itemName, price] = parseCsvLine(line) as [string, string, string];
       const vegan = /\(vegan\)/i.test(itemName);
       const cleanName = itemName.replace(/\s*\(vegan\)\s*/i, "").trim();
@@ -154,11 +181,13 @@ async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {
         description: buildMenuItemDescription(category, cleanName),
         price: parseMenuPrice(price),
         category: mapCsvMenuCategory(category),
+        image: await getMenuImagePath(cleanName),
         tags: vegan ? (["Vegan"] as MenuItem["tags"]) : [],
         visible: true,
         sortOrder: index + 1,
       } satisfies MenuItem;
-    });
+      }),
+    );
   } catch {
     return null;
   }
@@ -206,6 +235,7 @@ export async function getMenuItems(): Promise<MenuItem[]> {
     description: item.description ?? "",
     price: item.price,
     category: mapMenuCategory(item.category),
+    image: undefined,
     tags: (item.tags ?? []) as MenuItem["tags"],
     visible: item.visible ?? true,
     sortOrder: item.sort_order ?? 0,

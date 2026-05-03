@@ -8,8 +8,10 @@ type SiteShellProps = {
 };
 
 export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
+  const hasInnerPageBackdrop = ["/menu", "/speciality", "/gallery", "/find-us"].includes(currentPath);
+
   return (
-    <div className="site-shell min-h-screen text-charcoal">
+    <div className={`site-shell min-h-screen text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
       <header className="sticky top-0 z-50 h-16 border-b border-matcha-light/70 bg-white sm:h-[72px]">
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
           <Link href="/" className="font-display text-[1.9rem] tracking-[0.08em] text-matcha-deep sm:text-3xl">
@@ -60,8 +62,8 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
           </details>
         </div>
       </header>
-      <main>{children}</main>
-      <footer className="mt-16 bg-matcha-deep text-white sm:mt-24">
+      <main className="relative z-10">{children}</main>
+      <footer className="relative z-20 mt-16 bg-matcha-deep text-white sm:mt-24">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-10">
           <div>
             <div className="font-display text-[2.2rem] tracking-[0.08em] sm:text-4xl">USCO</div>

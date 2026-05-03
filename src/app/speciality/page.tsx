@@ -7,7 +7,7 @@ import { specialityItems } from "@/data/site";
 export default function SpecialityPage() {
   return (
     <SiteShell currentPath="/speciality">
-      <section className="px-4 pb-18 pt-16 sm:px-6 sm:pb-24 sm:pt-18 lg:px-10">
+      <section className="inner-page-surface px-4 pb-18 pt-16 sm:px-6 sm:pb-24 sm:pt-18 lg:px-10">
         <div className="mx-auto max-w-7xl">
           <SectionIntro
             eyebrow="Speciality"
