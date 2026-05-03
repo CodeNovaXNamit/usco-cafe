@@ -33,12 +33,16 @@
 
 html {
   background: var(--white);
+  margin: 0;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), serif;
+  margin: 0;
+  overflow-x: hidden;
 }
 
 a,
@@ -89,8 +93,19 @@ button {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   background: url("/background/laptop-bg.png") center center / cover no-repeat;
+  pointer-events: none;
+}
+
+.site-shell.inner-page-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(248, 246, 241, 0.82) 0%, rgba(248, 246, 241, 0.72) 24%, rgba(248, 246, 241, 0.78) 100%),
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.3), transparent 42%);
   pointer-events: none;
 }
 
@@ -260,6 +275,26 @@ button {
 @media (max-width: 767px) {
   .site-shell.inner-page-shell::before {
     background: url("/background/phone-bg.png") center center / cover no-repeat;
+  }
+
+  .site-shell.inner-page-shell::after {
+    background:
+      linear-gradient(180deg, rgba(248, 246, 241, 0.88) 0%, rgba(248, 246, 241, 0.78) 24%, rgba(248, 246, 241, 0.84) 100%),
+      radial-gradient(circle at top center, rgba(255, 255, 255, 0.34), transparent 46%);
+  }
+
+  .menu-price-line {
+    gap: 0.32rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .menu-price-line__label {
+    font-size: 0.52rem;
+    letter-spacing: 0.2em;
+  }
+
+  .menu-price-line__value {
+    font-size: 1.18rem;
   }
 }
 

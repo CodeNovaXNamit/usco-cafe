@@ -1,9 +1,9 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
-const framesDirectory = path.join(process.cwd(), "frames");
+const animationDirectory = path.join(process.cwd(), "animation");
 
-const frameManifestPromise = readdir(framesDirectory).then((files) =>
+const frameManifestPromise = readdir(animationDirectory).then((files) =>
   files
     .filter((file) => file.endsWith(".webp"))
     .sort((left, right) => {
@@ -34,12 +34,12 @@ export async function GET(
     return new Response("Frame not found", { status: 404 });
   }
 
-  const filePath = path.join(framesDirectory, frameFile);
+  const filePath = path.join(animationDirectory, frameFile);
   const file = await readFile(filePath);
 
   return new Response(file, {
     headers: {
-      "Cache-Control": "public, max-age=31536000, immutable",
+      "Cache-Control": "no-store",
       "Content-Type": "image/webp",
     },
   });

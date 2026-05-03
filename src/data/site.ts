@@ -1,9 +1,10 @@
 export const frameBaseUrl = "/api/frames";
+export const frameVersion = "animation-20260503";
 
-export const totalFrames = 119;
+export const totalFrames = 115;
 
 export function getFrameAssetUrl(index: number) {
-  return `${frameBaseUrl}/${index}`;
+  return `${frameBaseUrl}/${index}?v=${frameVersion}`;
 }
 
 export const navLinks = [

@@ -33,7 +33,7 @@ export default function HomePage() {
     <SiteShell currentPath="/">
       <FrameSequenceHero />
 
-      <section className="px-4 py-14 sm:px-6 sm:py-24 lg:px-10">
+      <section className="px-4 pb-14 pt-8 sm:px-6 sm:pb-24 sm:pt-12 lg:px-10">
         <SectionIntro
           title="Somewhere between your first sip and your last thought."
           body="USCO is a small place that asks very little of you. Sit. Breathe. Let the coffee do the rest."

@@ -2,14 +2,31 @@
 "use client";
 
 import Link from "next/link";
-import type { TouchEvent as ReactTouchEvent, WheelEvent as ReactWheelEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFrameAssetUrl, totalFrames } from "@/data/site";
 
-const mobilePlaybackDurationMs = 4000;
-
 function getFrameUrl(index: number) {
   return getFrameAssetUrl(index);
+}
+
+function getCoveredFrameBounds(
+  canvas: HTMLCanvasElement,
+  image: HTMLImageElement,
+) {
+  const { width, height } = canvas.getBoundingClientRect();
+  const imageRatio = image.width / image.height;
+  let drawWidth = width;
+  let drawHeight = width / imageRatio;
+
+  if (drawHeight < height) {
+    drawHeight = height;
+    drawWidth = drawHeight * imageRatio;
+  }
+
+  const offsetX = (width - drawWidth) / 2;
+  const offsetY = (height - drawHeight) / 2;
+
+  return { width, height, drawWidth, drawHeight, offsetX, offsetY };
 }
 
 function drawCoverImage(canvas: HTMLCanvasElement, image: HTMLImageElement, devicePixelRatio: number) {
@@ -23,24 +40,13 @@ function drawCoverImage(canvas: HTMLCanvasElement, image: HTMLImageElement, devi
   canvas.width = Math.round(width * devicePixelRatio);
   canvas.height = Math.round(height * devicePixelRatio);
   ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#f6f3ec";
+  ctx.fillRect(0, 0, width, height);
 
-  const imageRatio = image.width / image.height;
-  const canvasRatio = width / height;
-  let drawWidth = width;
-  let drawHeight = height;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  if (imageRatio > canvasRatio) {
-    drawHeight = height;
-    drawWidth = drawHeight * imageRatio;
-    offsetX = (width - drawWidth) / 2;
-  } else {
-    drawWidth = width;
-    drawHeight = drawWidth / imageRatio;
-    offsetY = (height - drawHeight) / 2;
-  }
+  const { drawWidth, drawHeight, offsetX, offsetY } = getCoveredFrameBounds(canvas, image);
 
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
@@ -64,23 +70,7 @@ function drawCoverImages(
     return;
   }
 
-  const { width, height } = canvas.getBoundingClientRect();
-  const imageRatio = nextImage.width / nextImage.height;
-  const canvasRatio = width / height;
-  let drawWidth = width;
-  let drawHeight = height;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  if (imageRatio > canvasRatio) {
-    drawHeight = height;
-    drawWidth = drawHeight * imageRatio;
-    offsetX = (width - drawWidth) / 2;
-  } else {
-    drawWidth = width;
-    drawHeight = drawWidth / imageRatio;
-    offsetY = (height - drawHeight) / 2;
-  }
+  const { drawWidth, drawHeight, offsetX, offsetY } = getCoveredFrameBounds(canvas, nextImage);
 
   ctx.save();
   ctx.globalAlpha = blend;
@@ -177,8 +167,7 @@ export function FrameSequenceHero() {
   const [loadedCount, setLoadedCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [sequenceStarted, setSequenceStarted] = useState(false);
-  const [sequenceComplete, setSequenceComplete] = useState(false);
+  const [pinPhase, setPinPhase] = useState<"before" | "active" | "after">("before");
   const [foregroundMode, setForegroundMode] = useState<"dark" | "light">("light");
   const [brandColors, setBrandColors] = useState<string[]>([]);
   const [taglineColors, setTaglineColors] = useState<string[]>([]);
@@ -187,14 +176,18 @@ export function FrameSequenceHero() {
   const [asideColors, setAsideColors] = useState<string[]>([]);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const devicePixelRatioRef = useRef(1);
-  const playbackRef = useRef<number | null>(null);
+  const scrollAnimationRef = useRef<number | null>(null);
+  const targetProgressRef = useRef(0);
+  const progressRef = useRef(0);
+  const visualSampleRef = useRef({ key: -1, time: 0 });
   const foregroundModeRef = useRef<"dark" | "light">("light");
+  const posterFrameIndex = 0;
   const overlay = useMemo(() => {
     if (progress < 0.2) {
       return {
         kicker: "Coffee + Quiet",
         line: "A narrow door. A warm light. Come in.",
-        cta: isMobile ? "Begin" : "Scroll slowly",
+        cta: isMobile ? "Explore Menu" : "Scroll slowly",
       };
     }
 
@@ -202,7 +195,7 @@ export function FrameSequenceHero() {
       return {
         kicker: "Somewhere between your first sip and your last thought.",
         line: "The walk in becomes part of the ritual.",
-        cta: isMobile ? "Playing" : "Keep going",
+        cta: isMobile ? "Explore Menu" : "Keep going",
       };
     }
 
@@ -264,7 +257,7 @@ export function FrameSequenceHero() {
   const useCharacterContrast = !isMobile && !reducedMotion;
 
   useEffect(() => {
-    const media = window.matchMedia("(max-width: 639px)");
+    const media = window.matchMedia("(max-width: 767px)");
     const motionMedia = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updateMedia = () => {
       const nextIsMobile = media.matches;
@@ -272,9 +265,9 @@ export function FrameSequenceHero() {
       setReducedMotion(motionMedia.matches);
 
       if (!nextIsMobile) {
-        setSequenceStarted(false);
-        setSequenceComplete(false);
         setProgress(0);
+        progressRef.current = 0;
+        targetProgressRef.current = 0;
       }
     };
 
@@ -299,6 +292,7 @@ export function FrameSequenceHero() {
 
     for (let index = 0; index < totalFrames; index += 1) {
       const image = new window.Image();
+      image.decoding = "async";
       image.src = getFrameUrl(index);
       image.onload = () => {
         if (cancelled) {
@@ -332,9 +326,9 @@ export function FrameSequenceHero() {
   }, [reducedMotion, useCharacterContrast]);
 
   useEffect(() => {
-    devicePixelRatioRef.current = window.devicePixelRatio || 1;
+    devicePixelRatioRef.current = Math.min(window.devicePixelRatio || 1, isMobile ? 1.2 : 1.35);
 
-    if (isMobile || reducedMotion) {
+    if (reducedMotion) {
       return;
     }
 
@@ -345,11 +339,39 @@ export function FrameSequenceHero() {
         return;
       }
 
+      const headerOffset = window.innerWidth >= 640 ? 72 : 64;
+      const pinnedViewportHeight = Math.max(window.innerHeight - headerOffset, 1);
       const rect = container.getBoundingClientRect();
-      const total = Math.max(container.offsetHeight - window.innerHeight, 1);
-      const nextProgress = Math.min(Math.max(-rect.top / total, 0), 1);
+      const total = Math.max(container.offsetHeight - pinnedViewportHeight, 1);
+      const nextProgress = Math.min(Math.max((headerOffset - rect.top) / total, 0), 1);
+      targetProgressRef.current = nextProgress;
+      const nextPinPhase =
+        rect.top > headerOffset ? "before" : rect.bottom > window.innerHeight ? "active" : "after";
+      setPinPhase((current) => (current === nextPinPhase ? current : nextPinPhase));
 
-      setProgress(nextProgress);
+      if (scrollAnimationRef.current) {
+        return;
+      }
+
+      const animate = () => {
+        const currentProgress = progressRef.current;
+        const delta = targetProgressRef.current - currentProgress;
+        const easing = isMobile ? 0.085 : 0.11;
+
+        if (Math.abs(delta) < 0.0015) {
+          progressRef.current = targetProgressRef.current;
+          setProgress(targetProgressRef.current);
+          scrollAnimationRef.current = null;
+          return;
+        }
+
+        const nextValue = currentProgress + delta * easing;
+        progressRef.current = nextValue;
+        setProgress(nextValue);
+        scrollAnimationRef.current = window.requestAnimationFrame(animate);
+      };
+
+      scrollAnimationRef.current = window.requestAnimationFrame(animate);
     };
 
     updateProgress();
@@ -370,6 +392,11 @@ export function FrameSequenceHero() {
     window.addEventListener("resize", updateProgress);
 
     return () => {
+      if (scrollAnimationRef.current) {
+        window.cancelAnimationFrame(scrollAnimationRef.current);
+        scrollAnimationRef.current = null;
+      }
+
       if (scrollFrame) {
         window.cancelAnimationFrame(scrollFrame);
       }
@@ -378,57 +405,6 @@ export function FrameSequenceHero() {
       window.removeEventListener("resize", updateProgress);
     };
   }, [isMobile, reducedMotion]);
-
-  useEffect(() => {
-    if (!isMobile || reducedMotion || !sequenceStarted || sequenceComplete) {
-      return;
-    }
-
-    const startTime = performance.now();
-
-    const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const nextProgress = Math.min(elapsed / mobilePlaybackDurationMs, 1);
-      setProgress(nextProgress);
-
-      if (nextProgress >= 1) {
-        setSequenceComplete(true);
-        playbackRef.current = null;
-        return;
-      }
-
-      playbackRef.current = window.requestAnimationFrame(tick);
-    };
-
-    playbackRef.current = window.requestAnimationFrame(tick);
-
-    return () => {
-      if (playbackRef.current) {
-        window.cancelAnimationFrame(playbackRef.current);
-        playbackRef.current = null;
-      }
-    };
-  }, [isMobile, reducedMotion, sequenceComplete, sequenceStarted]);
-
-  useEffect(() => {
-    if (!isMobile || reducedMotion || sequenceComplete || !sequenceStarted) {
-      return;
-    }
-
-    const lockScroll = (event: Event) => {
-      event.preventDefault();
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("wheel", lockScroll, { passive: false });
-    window.addEventListener("touchmove", lockScroll, { passive: false });
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("wheel", lockScroll);
-      window.removeEventListener("touchmove", lockScroll);
-    };
-  }, [isMobile, reducedMotion, sequenceComplete, sequenceStarted]);
 
   useEffect(() => {
     if (reducedMotion) {
@@ -441,9 +417,6 @@ export function FrameSequenceHero() {
       return;
     }
 
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    devicePixelRatioRef.current = devicePixelRatio;
-
     const exactFrame = progress * (totalFrames - 1);
     const currentIndex = Math.floor(exactFrame);
     const blend = exactFrame - currentIndex;
@@ -454,82 +427,47 @@ export function FrameSequenceHero() {
       return;
     }
 
-    if (isMobile) {
-      drawCoverImages(canvas, currentImage, nextImage ?? null, blend, devicePixelRatio);
-    } else {
-      drawCoverImage(canvas, currentImage, devicePixelRatio);
-    }
+    drawCoverImages(canvas, currentImage, nextImage ?? null, blend, devicePixelRatioRef.current);
 
-    const nextMode = detectForegroundMode(canvas);
-    if (nextMode !== foregroundModeRef.current) {
-      foregroundModeRef.current = nextMode;
-      setForegroundMode(nextMode);
-    }
+    const sampleKey = Math.round(exactFrame * (isMobile ? 3 : 2));
+    const now = performance.now();
+    const shouldRefreshVisualSampling =
+      sampleKey !== visualSampleRef.current.key || now - visualSampleRef.current.time >= 160;
 
-    if (useCharacterContrast) {
-      applyCharacterColors("brand", setBrandColors);
-      applyCharacterColors("tagline", setTaglineColors);
-      applyCharacterColors("kicker", setKickerColors);
-      applyCharacterColors("line", setLineColors);
-      applyCharacterColors("aside", setAsideColors);
+    if (shouldRefreshVisualSampling) {
+      visualSampleRef.current = { key: sampleKey, time: now };
+
+      const nextMode = detectForegroundMode(canvas);
+      if (nextMode !== foregroundModeRef.current) {
+        foregroundModeRef.current = nextMode;
+        setForegroundMode(nextMode);
+      }
+
+      if (useCharacterContrast) {
+        applyCharacterColors("brand", setBrandColors);
+        applyCharacterColors("tagline", setTaglineColors);
+        applyCharacterColors("kicker", setKickerColors);
+        applyCharacterColors("line", setLineColors);
+        applyCharacterColors("aside", setAsideColors);
+      }
     }
   }, [isMobile, loadedCount, progress, reducedMotion, useCharacterContrast]);
 
-  const startSequence = () => {
-    if (!isMobile || reducedMotion || sequenceStarted || loadedCount < totalFrames) {
-      return;
-    }
-
-    setSequenceStarted(true);
-    setSequenceComplete(false);
-    setProgress(0);
-  };
-
   const scrollStep = () => {
-    if (isMobile && !sequenceStarted) {
-      startSequence();
-      return;
-    }
-
     window.scrollBy({
-      top: Math.max(window.innerHeight * (isMobile ? 0.72 : 0.88), 320),
+      top: Math.max(window.innerHeight * (isMobile ? 0.42 : 0.88), 220),
       behavior: "smooth",
     });
   };
 
-  const handleInitialMobileWheel = (event: ReactWheelEvent<HTMLElement>) => {
-    if (!isMobile || reducedMotion || sequenceStarted) {
-      return;
-    }
-
-    event.preventDefault();
-    startSequence();
-  };
-
-  const handleInitialMobileTouchStart = (event: ReactTouchEvent<HTMLElement>) => {
-    if (!isMobile || reducedMotion || sequenceStarted) {
-      return;
-    }
-
-    event.preventDefault();
-    startSequence();
-  };
-
-  const handleInitialMobileTouchMove = (event: ReactTouchEvent<HTMLElement>) => {
-    if (!isMobile || reducedMotion || sequenceStarted) {
-      return;
-    }
-
-    event.preventDefault();
-    startSequence();
-  };
-
   const ready = reducedMotion || loadedCount >= totalFrames;
-  const loadingProgress = ready ? 100 : Math.round((loadedCount / totalFrames) * 100);
+  const loadingProgress = reducedMotion ? 100 : Math.round((loadedCount / totalFrames) * 100);
   const isCompactHero = isMobile || reducedMotion;
-  const heroHeightClass = isCompactHero
-    ? "h-[calc(100svh+5rem)] sm:h-[calc(100svh+88px)]"
-    : "h-[420vh] lg:h-[600vh]";
+  const heroHeightClass = reducedMotion
+    ? "h-[calc(100svh+2.5rem)]"
+    : isMobile
+      ? "h-[240svh]"
+      : "h-[560vh] xl:h-[600vh]";
   const usesDarkForeground = foregroundMode === "dark";
   const primaryTextClass = usesDarkForeground ? "text-matcha-deep" : "text-white";
   const accentTextClass = usesDarkForeground ? "text-matcha-mid" : "text-white/88";
@@ -538,16 +476,16 @@ export function FrameSequenceHero() {
     ? "border-matcha-deep/20 bg-white/88 text-matcha-deep hover:bg-white"
     : "border-white/50 bg-white/20 text-white hover:bg-white/30";
   const secondaryLinkClass = usesDarkForeground ? "text-matcha-deep/80 hover:text-matcha-deep" : "text-white/85 hover:text-white";
+  const heroViewportClass =
+    pinPhase === "active"
+      ? "fixed inset-x-0 top-16 h-[calc(100svh-4rem)] sm:top-[72px] sm:h-[calc(100svh-72px)]"
+      : pinPhase === "after"
+        ? "absolute inset-x-0 bottom-0 h-[calc(100svh-4rem)] sm:h-[calc(100svh-72px)]"
+        : "absolute inset-x-0 top-0 h-[calc(100svh-4rem)] sm:h-[calc(100svh-72px)]";
 
   return (
-    <section
-      ref={containerRef}
-      onWheel={handleInitialMobileWheel}
-      onTouchStart={handleInitialMobileTouchStart}
-      onTouchMove={handleInitialMobileTouchMove}
-      className={`relative ${heroHeightClass}`}
-    >
-      <div className="sticky top-16 h-[calc(100svh-4rem)] overflow-hidden bg-[#f6f3ec] sm:top-[72px] sm:h-[calc(100svh-72px)]">
+    <section ref={containerRef} className={`relative ${heroHeightClass}`}>
+      <div className={`${heroViewportClass} overflow-hidden bg-[#f6f3ec]`}>
         {!ready ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white text-matcha-deep">
             <div className="px-4 text-center font-display text-5xl tracking-[0.12em] sm:text-6xl">USCO</div>
@@ -566,7 +504,7 @@ export function FrameSequenceHero() {
         {reducedMotion ? (
           <div className="absolute inset-0">
             <img
-              src={getFrameUrl(0)}
+              src={getFrameUrl(posterFrameIndex)}
               alt="USCO cafe exterior"
               className="absolute inset-0 h-full w-full object-cover"
             />
@@ -619,7 +557,7 @@ export function FrameSequenceHero() {
                   href="/menu"
                   className={`inline-flex min-h-11 w-full items-center justify-center rounded-full border px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] transition-[transform,color,background-color,border-color] duration-300 hover:scale-[1.02] sm:w-auto sm:px-6 sm:text-xs ${buttonClass}`}
                 >
-                  {isMobile && sequenceComplete ? "Explore" : overlay.cta}
+                  {overlay.cta}
                 </Link>
                 <Link
                   href="/find-us"
@@ -637,7 +575,7 @@ export function FrameSequenceHero() {
                     : "border-white/35 bg-black/12 text-white/88 hover:bg-black/20"
                 }`}
               >
-                <span>{isMobile && !sequenceStarted ? "Start" : "Scroll"}</span>
+                <span>{isMobile ? "See More" : "Scroll"}</span>
                 <span
                   className={`hero-scroll-cue block h-3.5 w-3.5 rounded-full ${
                     usesDarkForeground ? "border border-matcha-deep/35" : "border border-white/55"
