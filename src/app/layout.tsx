@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import {
   Cormorant_Garamond,
   Cormorant_SC,
@@ -6,6 +7,8 @@ import {
   Syne,
 } from "next/font/google";
 import "./globals.css";
+
+const googleTagId = "G-KCLRMC4ZYD";
 
 const displayFont = Cormorant_Garamond({
   variable: "--font-display",
@@ -67,6 +70,18 @@ export default function RootLayout({
       className={`${displayFont.variable} ${bodyFont.variable} ${uiFont.variable} ${accentFont.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${googleTagId}');
+        `}
+      </Script>
     </html>
   );
 }
