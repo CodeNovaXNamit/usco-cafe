@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --header-offset: 4rem;
   --white: #f8f6f1;
   --matcha-light: #d4dfc0;
   --matcha-mid: #8fa96b;
@@ -64,6 +65,49 @@ button {
   background:
     radial-gradient(circle at top left, rgba(212, 223, 192, 0.55), transparent 28%),
     linear-gradient(180deg, #fbfaf5 0%, var(--white) 45%, #f2f3eb 100%);
+}
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  background-color: var(--white);
+  isolation: isolate;
+}
+
+.site-main {
+  padding-top: var(--header-offset);
+}
+
+.home-hero {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-fade-slide {
+  opacity: 0;
+  transition: opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-fade-slide.is-active {
+  opacity: 1;
+}
+
+.home-hero__viewport {
+  position: sticky;
+  top: var(--header-offset);
+  height: calc(100svh - var(--header-offset));
+  z-index: 1;
+  background: #f6f3ec;
+}
+
+.home-hero__media,
+.home-hero__media canvas,
+.home-hero__media img {
+  z-index: 1;
+  display: block;
 }
 
 .inner-page-surface {
@@ -131,6 +175,136 @@ button {
 
 .section-fade {
   animation: sectionFade 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.home-motion-surface {
+  --motion-delay: 0s;
+}
+
+.home-motion-text {
+  opacity: 0;
+  animation: homeTextReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--motion-delay) both;
+  will-change: transform, opacity;
+}
+
+.home-motion-text--drift {
+  animation:
+    homeTextReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--motion-delay) both,
+    homeTextDrift 6.8s ease-in-out calc(var(--motion-delay) + 1s) infinite alternate;
+}
+
+.loading-screen {
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top center, rgba(212, 223, 192, 0.28), transparent 34%),
+    linear-gradient(180deg, #fbfaf5 0%, #f8f6f1 100%);
+  color: var(--matcha-deep);
+  padding: 2rem 1.5rem;
+}
+
+.loading-screen__mark {
+  font-family: var(--font-display), serif;
+  font-size: clamp(3rem, 7vw, 4.5rem);
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.loading-screen__label {
+  margin-top: 0.9rem;
+  font-family: var(--font-accent), serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--matcha-mid);
+  text-align: center;
+}
+
+.loading-screen__bar {
+  margin-top: 2rem;
+  height: 1px;
+  width: min(15rem, 70vw);
+  overflow: hidden;
+  background: rgba(143, 169, 107, 0.22);
+}
+
+.loading-screen__bar-fill {
+  height: 100%;
+  width: 45%;
+  background: var(--matcha-mid);
+  animation: loadingBar 1.2s ease-in-out infinite;
+}
+
+.review-marquee {
+  overflow: hidden;
+}
+
+.review-cta-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.review-cta-card::after {
+  content: "";
+  position: absolute;
+  right: -2.5rem;
+  top: -2.5rem;
+  height: 8rem;
+  width: 8rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(212, 223, 192, 0.42) 0%, rgba(212, 223, 192, 0) 72%);
+  pointer-events: none;
+}
+
+.review-cta-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+}
+
+.review-cta-pulse span {
+  display: block;
+  height: 0.42rem;
+  width: 0.42rem;
+  border-radius: 9999px;
+  background: var(--matcha-mid);
+  animation: reviewPulse 1.35s ease-in-out infinite;
+}
+
+.review-cta-pulse span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.review-cta-pulse span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+.review-marquee__track {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  will-change: transform;
+  animation: reviewMarquee 34s linear infinite;
+}
+
+.review-chip {
+  position: relative;
+  overflow: hidden;
+}
+
+.review-chip::after {
+  content: "";
+  position: absolute;
+  right: -1rem;
+  bottom: -1.8rem;
+  height: 5rem;
+  width: 5rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(212, 223, 192, 0.38) 0%, rgba(212, 223, 192, 0) 72%);
+  pointer-events: none;
 }
 
 .home-offering-row {
@@ -230,6 +404,30 @@ button {
   }
 }
 
+@keyframes homeTextReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    filter: blur(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes homeTextDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
 @keyframes offeringMarqueeLeft {
   from {
     transform: translate3d(0, 0, 0);
@@ -250,7 +448,53 @@ button {
   }
 }
 
+@keyframes reviewMarquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(-50% - 0.5rem), 0, 0);
+  }
+}
+
+@keyframes reviewPulse {
+  0%,
+  100% {
+    opacity: 0.38;
+    transform: translate3d(0, 0, 0) scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate3d(0, -2px, 0) scale(1);
+  }
+}
+
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(260%);
+  }
+}
+
 @media (min-width: 640px) {
+  :root {
+    --header-offset: 72px;
+  }
+
+  .site-main {
+    padding-top: var(--header-offset);
+  }
+
+  .home-hero__viewport {
+    top: var(--header-offset);
+    height: calc(100svh - var(--header-offset));
+  }
+
   .home-offering-group {
     gap: 2rem;
     padding-right: 2rem;
@@ -273,6 +517,13 @@ button {
 }
 
 @media (max-width: 767px) {
+  .site-header {
+    background: rgba(248, 246, 241, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 28px rgba(30, 30, 26, 0.08);
+  }
+
   .site-shell.inner-page-shell::before {
     background: url("/background/phone-bg.png") center center / cover no-repeat;
   }
@@ -296,6 +547,7 @@ button {
   .menu-price-line__value {
     font-size: 1.18rem;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -314,5 +566,9 @@ button {
 
   .home-offering-track {
     transform: none !important;
+  }
+
+  .review-marquee__track {
+    animation: none !important;
   }
 }

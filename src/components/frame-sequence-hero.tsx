@@ -167,7 +167,6 @@ export function FrameSequenceHero() {
   const [loadedCount, setLoadedCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [pinPhase, setPinPhase] = useState<"before" | "active" | "after">("before");
   const [foregroundMode, setForegroundMode] = useState<"dark" | "light">("light");
   const [brandColors, setBrandColors] = useState<string[]>([]);
   const [taglineColors, setTaglineColors] = useState<string[]>([]);
@@ -339,15 +338,14 @@ export function FrameSequenceHero() {
         return;
       }
 
-      const headerOffset = window.innerWidth >= 640 ? 72 : 64;
-      const pinnedViewportHeight = Math.max(window.innerHeight - headerOffset, 1);
+      const headerHeight =
+        document.querySelector<HTMLElement>(".site-header")?.getBoundingClientRect().height ??
+        (window.innerWidth >= 640 ? 72 : 64);
       const rect = container.getBoundingClientRect();
-      const total = Math.max(container.offsetHeight - pinnedViewportHeight, 1);
-      const nextProgress = Math.min(Math.max((headerOffset - rect.top) / total, 0), 1);
+      const stickyViewportHeight = Math.max(window.innerHeight - headerHeight, 1);
+      const total = Math.max(container.offsetHeight - stickyViewportHeight, 1);
+      const nextProgress = Math.min(Math.max((headerHeight - rect.top) / total, 0), 1);
       targetProgressRef.current = nextProgress;
-      const nextPinPhase =
-        rect.top > headerOffset ? "before" : rect.bottom > window.innerHeight ? "active" : "after";
-      setPinPhase((current) => (current === nextPinPhase ? current : nextPinPhase));
 
       if (scrollAnimationRef.current) {
         return;
@@ -462,7 +460,6 @@ export function FrameSequenceHero() {
 
   const ready = reducedMotion || loadedCount >= totalFrames;
   const loadingProgress = reducedMotion ? 100 : Math.round((loadedCount / totalFrames) * 100);
-  const isCompactHero = isMobile || reducedMotion;
   const heroHeightClass = reducedMotion
     ? "h-[calc(100svh+2.5rem)]"
     : isMobile
@@ -476,16 +473,10 @@ export function FrameSequenceHero() {
     ? "border-matcha-deep/20 bg-white/88 text-matcha-deep hover:bg-white"
     : "border-white/50 bg-white/20 text-white hover:bg-white/30";
   const secondaryLinkClass = usesDarkForeground ? "text-matcha-deep/80 hover:text-matcha-deep" : "text-white/85 hover:text-white";
-  const heroViewportClass =
-    pinPhase === "active"
-      ? "fixed inset-x-0 top-16 h-[calc(100svh-4rem)] sm:top-[72px] sm:h-[calc(100svh-72px)]"
-      : pinPhase === "after"
-        ? "absolute inset-x-0 bottom-0 h-[calc(100svh-4rem)] sm:h-[calc(100svh-72px)]"
-        : "absolute inset-x-0 top-0 h-[calc(100svh-4rem)] sm:h-[calc(100svh-72px)]";
 
   return (
-    <section ref={containerRef} className={`relative ${heroHeightClass}`}>
-      <div className={`${heroViewportClass} overflow-hidden bg-[#f6f3ec]`}>
+    <section ref={containerRef} className={`home-hero ${heroHeightClass}`}>
+      <div className="home-hero__viewport">
         {!ready ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white text-matcha-deep">
             <div className="px-4 text-center font-display text-5xl tracking-[0.12em] sm:text-6xl">USCO</div>
@@ -502,7 +493,7 @@ export function FrameSequenceHero() {
         ) : null}
 
         {reducedMotion ? (
-          <div className="absolute inset-0">
+          <div className="home-hero__media absolute inset-0">
             <img
               src={getFrameUrl(posterFrameIndex)}
               alt="USCO cafe exterior"
@@ -510,7 +501,9 @@ export function FrameSequenceHero() {
             />
           </div>
         ) : (
-          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
+          <div className="home-hero__media absolute inset-0">
+            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
+          </div>
         )}
 
         <div className="absolute inset-0 bg-gradient-to-b from-white/82 via-white/18 to-black/26" />

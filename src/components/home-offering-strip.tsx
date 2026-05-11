@@ -39,7 +39,7 @@ function OfferingRow({
                     className="max-h-[78px] w-auto max-w-[112px] object-contain drop-shadow-[0_12px_24px_rgba(74,94,56,0.22)] transition duration-500 group-hover:-translate-y-1 group-hover:scale-[1.04] sm:max-h-[86px] sm:max-w-[126px] lg:max-h-[98px] lg:max-w-[138px]"
                   />
                 </div>
-                <span className="mt-3 inline-flex rounded-full bg-[rgba(248,246,241,0.78)] px-3 py-1 font-sans text-[10px] uppercase tracking-[0.2em] text-matcha-deep shadow-[0_10px_20px_rgba(74,94,56,0.08)] backdrop-blur-sm sm:text-[11px]">
+                <span className="home-motion-text home-motion-text--drift mt-3 inline-flex rounded-full bg-[rgba(248,246,241,0.78)] px-3 py-1 font-sans text-[10px] uppercase tracking-[0.2em] text-matcha-deep shadow-[0_10px_20px_rgba(74,94,56,0.08)] backdrop-blur-sm sm:text-[11px]">
                   {item.name}
                 </span>
               </Link>

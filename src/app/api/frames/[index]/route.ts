@@ -3,18 +3,20 @@ import path from "node:path";
 
 const animationDirectory = path.join(process.cwd(), "animation");
 
-const frameManifestPromise = readdir(animationDirectory).then((files) =>
-  files
-    .filter((file) => file.endsWith(".webp"))
-    .sort((left, right) => {
-      const leftMatch = left.match(/frame_(\d+)/);
-      const rightMatch = right.match(/frame_(\d+)/);
-      const leftIndex = leftMatch ? Number(leftMatch[1]) : Number.MAX_SAFE_INTEGER;
-      const rightIndex = rightMatch ? Number(rightMatch[1]) : Number.MAX_SAFE_INTEGER;
+const frameManifestPromise = readdir(animationDirectory)
+  .then((files) =>
+    files
+      .filter((file) => file.endsWith(".webp"))
+      .sort((left, right) => {
+        const leftMatch = left.match(/frame_(\d+)/);
+        const rightMatch = right.match(/frame_(\d+)/);
+        const leftIndex = leftMatch ? Number(leftMatch[1]) : Number.MAX_SAFE_INTEGER;
+        const rightIndex = rightMatch ? Number(rightMatch[1]) : Number.MAX_SAFE_INTEGER;
 
-      return leftIndex - rightIndex;
-    }),
-);
+        return leftIndex - rightIndex;
+      }),
+  )
+  .catch(() => []);
 
 export async function GET(
   _request: Request,

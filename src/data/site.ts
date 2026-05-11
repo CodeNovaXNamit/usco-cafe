@@ -10,7 +10,6 @@ export function getFrameAssetUrl(index: number) {
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
-  { href: "/speciality", label: "Speciality" },
   { href: "/gallery", label: "Gallery" },
   { href: "/find-us", label: "Find Us" },
 ] as const;
@@ -389,83 +388,6 @@ export const homeOfferingStripItems: HomeOfferingStripItem[] = [
   },
 ];
 
-export type SpecialityItem = {
-  id: string;
-  name: string;
-  origin: string;
-  story: string;
-  process: string[];
-  details: string;
-  image: string;
-};
-
-export const specialityItems: SpecialityItem[] = [
-  {
-    id: "usco-signature",
-    name: "The USCO Signature",
-    origin: "HOUSE BLEND / BROWN BUTTER / CARDAMOM",
-    story:
-      "There is a soft, nutty warmth before the espresso arrives. Then the cardamom follows, almost late. It stays near the back of the palate like a second thought worth keeping.",
-    process: [
-      "01 - Pull a short house blend espresso.",
-      "02 - Fold in browned butter syrup while warm.",
-      "03 - Steam milk low and velvet-smooth.",
-      "04 - Finish with a whisper of cardamom.",
-    ],
-    details:
-      "Built to feel familiar at first sip, then just strange enough to become your order from then on.",
-    image: getFrameAssetUrl(84),
-  },
-  {
-    id: "matcha-still-life",
-    name: "Matcha Still Life",
-    origin: "CEREMONIAL MATCHA / OAT MILK / CERAMIC SERVICE",
-    story:
-      "This one is not made quickly, even when the bar is full. The bowl slows the hand down. The foam sits quietly. People who order it usually stay longer than they meant to.",
-    process: [
-      "01 - Sift ceremonial matcha to remove bitterness.",
-      "02 - Whisk at 80C until the surface turns glossy.",
-      "03 - Add warm oat milk in a thin ribbon.",
-      "04 - Serve in the ceramic bowl cup, no rush.",
-    ],
-    details:
-      "The oat option is deliberate, not an afterthought. It rounds the edges without making the drink heavy.",
-    image: getFrameAssetUrl(67),
-  },
-  {
-    id: "hojicha-tonic",
-    name: "Hojicha Tonic",
-    origin: "ROASTED TEA / TONIC / ORANGE PEEL",
-    story:
-      "Roasted tea does not ask for attention. It earns it slowly. The tonic keeps it bright. The orange peel opens first, then leaves the tea to finish the sentence.",
-    process: [
-      "01 - Brew hojicha and chill it fully.",
-      "02 - Build over one large cube.",
-      "03 - Top with tonic to preserve lift.",
-      "04 - Express orange peel over the rim.",
-    ],
-    details:
-      "The bitterness is the point. It keeps the sweetness from becoming decoration.",
-    image: getFrameAssetUrl(96),
-  },
-  {
-    id: "cold-brew-noir",
-    name: "Cold Brew Noir",
-    origin: "18-HOUR STEEP / ROOM TEMP / UNSWEETENED",
-    story:
-      "Served without the theatre of ice so the roast can stay intact. Dark chocolate, cedar, a little patience. For people who like their coffee to feel less explained.",
-    process: [
-      "01 - Grind coarse and steep for 18 hours.",
-      "02 - Filter twice for a clean body.",
-      "03 - Rest overnight before service.",
-      "04 - Pour at room temperature for texture.",
-    ],
-    details:
-      "It changes as it warms in the glass. That is part of the drink, not a flaw to manage.",
-    image: getFrameAssetUrl(111),
-  },
-];
-
 export type GalleryCategory =
   | "all"
   | "space"
@@ -598,6 +520,12 @@ export const findUs = {
   instagram: "@usco.cafe",
   mapUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.3424860495943!2d77.2164567!3d28.547473399999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce34ee3b5c2d5%3A0xc861a88ed99ee032!2sUSCO%20CAFE!5e1!3m2!1sen!2sin!4v1777708200413!5m2!1sen!2sin",
+};
+
+export const googleReviewCta = {
+  href: "https://www.google.com/maps/search/?api=1&query=USCO+CAFE+Shahpur+Jat+New+Delhi",
+  ratingLabel: "4.7 on Google",
+  visitorLabel: "139+ happy visitors",
 };
 
 export const adminStats = {
