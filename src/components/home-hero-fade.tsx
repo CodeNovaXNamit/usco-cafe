@@ -8,7 +8,7 @@ export function HomeHeroFade() {
         <div className="relative overflow-hidden">
           <div className="relative h-[calc(100svh-var(--header-offset))] min-h-[32rem] sm:h-[calc(100svh-var(--header-offset))] sm:min-h-[34rem] lg:min-h-[42rem]">
             <Image
-              src="/home/Hero/Phone2.png"
+              src="/home/Hero/Phone3.jpeg"
               alt="USCO cafe exterior in daylight"
               fill
               priority
