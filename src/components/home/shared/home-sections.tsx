@@ -5,6 +5,7 @@ import { IconMark } from "@/components/icon-mark";
 import { SectionIntro } from "@/components/section-intro";
 import { pillars } from "@/data/site";
 import type { HomeTeaserCard } from "./home-content";
+import { MotionInView } from "./motion-in-view";
 
 type IntroSectionProps = {
   title: string;
@@ -35,25 +36,30 @@ export function HomePillarsSection({
     <section className={className}>
       <div className={gridClassName}>
         {pillars.map((pillar, index) => (
-          <article
+          <MotionInView
             key={pillar.title}
-            className={`pillar-glass-card grain rounded-[28px] border border-matcha-light/55 bg-[linear-gradient(180deg,rgba(143,169,107,0.24),rgba(212,223,192,0.14))] p-6 shadow-[0_20px_54px_rgba(74,94,56,0.12)] backdrop-blur-xl sm:p-8 ${cardClassName}`}
-            style={{ "--pillar-delay": `${0.08 + index * 0.12}s` } as CSSProperties}
+            direction={index % 3 === 1 ? "bottom" : index % 3 === 2 ? "right" : "left"}
+            delay={`${0.04 + index * 0.08}s`}
+            className="rounded-[28px]"
           >
-            <IconMark kind={pillar.icon as "cup" | "leaf" | "clock"} />
-            <h3
-              className="home-motion-text home-motion-text--drift mt-6 font-display text-3xl text-matcha-deep sm:mt-8 sm:text-4xl"
-              style={{ "--motion-delay": `${0.12 + index * 0.1}s` } as CSSProperties}
+            <article
+              className={`pillar-glass-card grain rounded-[28px] border border-matcha-light/55 bg-[linear-gradient(180deg,rgba(143,169,107,0.24),rgba(212,223,192,0.14))] p-6 shadow-[0_20px_54px_rgba(74,94,56,0.12)] backdrop-blur-xl sm:p-8 ${cardClassName}`}
             >
-              {pillar.title}
-            </h3>
-            <p
-              className="home-motion-text mt-3 text-base leading-7 text-charcoal/75 sm:text-lg sm:leading-8"
-              style={{ "--motion-delay": `${0.2 + index * 0.1}s` } as CSSProperties}
-            >
-              {pillar.line}
-            </p>
-          </article>
+              <IconMark kind={pillar.icon as "cup" | "leaf" | "clock"} />
+              <h3
+                className="home-motion-text home-motion-text--drift mt-6 font-display text-3xl text-matcha-deep sm:mt-8 sm:text-4xl"
+                style={{ "--motion-delay": `${0.12 + index * 0.1}s` } as CSSProperties}
+              >
+                {pillar.title}
+              </h3>
+              <p
+                className="home-motion-text mt-3 text-base leading-7 text-charcoal/75 sm:text-lg sm:leading-8"
+                style={{ "--motion-delay": `${0.2 + index * 0.1}s` } as CSSProperties}
+              >
+                {pillar.line}
+              </p>
+            </article>
+          </MotionInView>
         ))}
       </div>
     </section>
