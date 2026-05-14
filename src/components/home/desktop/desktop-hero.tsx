@@ -6,7 +6,7 @@ export function DesktopHero() {
     <section className="home-hero overflow-hidden">
       <div className="mx-auto max-w-none">
         <div className="relative overflow-hidden">
-          <div className="relative h-[calc(100svh-var(--header-offset))] min-h-[42rem]">
+          <div className="relative h-[100svh] min-h-[42rem]">
             <Image
               src="/media/desktop/hero-image.jpeg"
               alt="USCO cafe interior with warm natural light"

@@ -75,7 +75,9 @@ button {
   z-index: 9999;
   background: var(--white);
   isolation: isolate;
-  box-shadow: 0 10px 28px rgba(30, 30, 26, 0.06);
+  box-shadow:
+    0 1px 0 rgba(143, 169, 107, 0.14),
+    0 16px 36px rgba(30, 30, 26, 0.1);
 }
 
 .header-glass-nav {
@@ -117,6 +119,10 @@ button {
 
 .site-main {
   padding-top: var(--header-offset);
+}
+
+.site-main--flush {
+  padding-top: 0;
 }
 
 .home-hero {

@@ -59,7 +59,7 @@ export function PhoneHero() {
 
   return (
     <section ref={sectionRef} className="home-hero overflow-hidden">
-      <div className="relative h-[calc(100svh-var(--header-offset))] min-h-[32rem]">
+      <div className="relative h-[100svh] min-h-[32rem]">
         <video
           autoPlay
           muted

@@ -9,45 +9,46 @@ type SiteShellProps = {
 
 export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   const hasInnerPageBackdrop = ["/menu", "/gallery", "/find-us"].includes(currentPath);
+  const isHomePage = currentPath === "/";
 
   return (
     <div className={`site-shell min-h-screen text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
       <header className="site-header border-b border-matcha-light/70">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:px-10">
-          <Link
-            href="/"
-            className="min-w-0 flex-1 font-display text-[1.65rem] tracking-[0.08em] text-matcha-deep sm:text-3xl"
-          >
-            USCO
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-10">
+          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3 text-matcha-deep">
+            <span className="font-display text-[1.65rem] tracking-[0.08em] sm:text-3xl">USCO</span>
+            <span className="hidden h-10 w-px bg-matcha-light/80 sm:block" aria-hidden="true" />
+            <span className="hidden min-w-0 sm:flex sm:flex-col">
+              <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-matcha-mid">Coffee + Quiet</span>
+              <span className="font-serif text-sm italic text-matcha-deep/72">A slower cup in Shahpur Jat</span>
+            </span>
           </Link>
-          <div className="flex items-center justify-between gap-3 sm:gap-4 lg:flex-none">
-            <nav
-              aria-label="Primary"
-              className="header-glass-nav flex min-w-0 flex-1 items-center gap-1 overflow-x-auto rounded-full px-2 py-2 text-matcha-deep sm:gap-1.5 sm:px-2.5"
-            >
-              {navLinks.map((link) => {
-                const active = currentPath === link.href;
+          <nav
+            aria-label="Primary"
+            className="header-glass-nav flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto rounded-full px-1.5 py-1.5 text-matcha-deep sm:gap-1 sm:px-2"
+          >
+            {navLinks.map((link) => {
+              const active = currentPath === link.href;
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`header-glass-link relative min-w-fit rounded-full px-3 py-2 text-center font-sans text-[10px] uppercase tracking-[0.2em] sm:px-4 sm:text-[11px] sm:tracking-[0.24em] ${
-                      active ? "is-active bg-white/68 text-matcha-deep" : "text-matcha-deep/82 hover:text-matcha-deep"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
-            <div className="hidden rounded-full border border-matcha-light/60 bg-white/46 px-4 py-2 font-sans text-[11px] uppercase tracking-[0.18em] text-matcha-mid shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:block">
-              Open Today / 8am-8pm
-            </div>
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`header-glass-link relative min-w-0 rounded-full px-2.5 py-1.5 text-center font-sans text-[9px] uppercase tracking-[0.16em] sm:px-3 sm:py-2 sm:text-[10px] sm:tracking-[0.18em] ${
+                    active ? "is-active bg-white/68 text-matcha-deep" : "text-matcha-deep/82 hover:text-matcha-deep"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="hidden shrink-0 rounded-full border border-matcha-light/60 bg-white/46 px-4 py-2 font-sans text-[11px] uppercase tracking-[0.18em] text-matcha-mid shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] xl:block">
+            Open Today / 8am-8pm
           </div>
         </div>
       </header>
-      <main className="site-main relative z-10">{children}</main>
+      <main className={`site-main relative z-10 ${isHomePage ? "site-main--flush" : ""}`}>{children}</main>
       <footer className="relative z-20 mt-16 bg-matcha-deep text-white sm:mt-24">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-10">
           <div>
