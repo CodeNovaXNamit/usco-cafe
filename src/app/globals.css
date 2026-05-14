@@ -345,6 +345,40 @@ button {
   animation: offeringMarqueeRight 30s linear infinite;
 }
 
+.phone-speciality-card {
+  position: relative;
+  transform-origin: left center;
+  animation: phoneCardEnterLeft 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.phone-speciality-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 46%),
+    radial-gradient(circle at top right, rgba(212, 223, 192, 0.24), transparent 42%);
+}
+
+.pillar-glass-card {
+  position: relative;
+  overflow: hidden;
+  transform-origin: left center;
+  animation: pillarCardEnter 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--pillar-delay, 0s) both;
+}
+
+.pillar-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 48%),
+    radial-gradient(circle at top right, rgba(143, 169, 107, 0.18), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(212, 223, 192, 0.18), transparent 42%);
+}
+
 .menu-price-line {
   display: inline-flex;
   width: fit-content;
@@ -425,6 +459,46 @@ button {
 
   to {
     transform: translate3d(0, -4px, 0);
+  }
+}
+
+@keyframes phoneCardEnterLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-48px, 0, 0) scale(0.96);
+    box-shadow: 0 8px 18px rgba(74, 94, 56, 0.08);
+  }
+
+  68% {
+    opacity: 1;
+    transform: translate3d(8px, 0, 0) scale(1.01);
+    box-shadow: 0 26px 60px rgba(74, 94, 56, 0.18);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    box-shadow: 0 22px 55px rgba(74, 94, 56, 0.14);
+  }
+}
+
+@keyframes pillarCardEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(-42px, 0, 0) scale(0.97);
+    box-shadow: 0 10px 22px rgba(74, 94, 56, 0.08);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translate3d(6px, 0, 0) scale(1.01);
+    box-shadow: 0 24px 62px rgba(74, 94, 56, 0.16);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    box-shadow: 0 20px 54px rgba(74, 94, 56, 0.12);
   }
 }
 

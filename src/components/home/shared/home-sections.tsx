@@ -37,7 +37,8 @@ export function HomePillarsSection({
         {pillars.map((pillar, index) => (
           <article
             key={pillar.title}
-            className={`grain rounded-[28px] border border-matcha-light bg-matcha-light/60 p-6 shadow-[0_18px_50px_rgba(74,94,56,0.08)] sm:p-8 ${cardClassName}`}
+            className={`pillar-glass-card grain rounded-[28px] border border-matcha-light/55 bg-[linear-gradient(180deg,rgba(143,169,107,0.24),rgba(212,223,192,0.14))] p-6 shadow-[0_20px_54px_rgba(74,94,56,0.12)] backdrop-blur-xl sm:p-8 ${cardClassName}`}
+            style={{ "--pillar-delay": `${0.08 + index * 0.12}s` } as CSSProperties}
           >
             <IconMark kind={pillar.icon as "cup" | "leaf" | "clock"} />
             <h3

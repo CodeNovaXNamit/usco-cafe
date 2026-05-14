@@ -63,6 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${displayFont.variable} ${bodyFont.variable} ${uiFont.variable} ${accentFont.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">
