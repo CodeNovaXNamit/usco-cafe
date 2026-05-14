@@ -40,11 +40,6 @@ export const metadata: Metadata = {
   title: "USCO - Coffee + Quiet",
   description:
     "A small cafe that asks very little of you. Come in, sit down, let the coffee do the rest. At No. 4.",
-  icons: {
-    icon: "/home/Logo/logo-rounded.png",
-    shortcut: "/home/Logo/logo-rounded.png",
-    apple: "/home/Logo/logo-rounded.png",
-  },
   alternates: {
     canonical: "/",
   },
