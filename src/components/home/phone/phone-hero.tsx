@@ -66,6 +66,7 @@ export function PhoneHero() {
           loop
           playsInline
           preload="auto"
+          data-loader-critical
           className="absolute inset-0 h-full w-full object-cover object-center"
         >
           <source src="/media/phone/hero-video.mp4" type="video/mp4" />

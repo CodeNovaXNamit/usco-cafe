@@ -13,6 +13,7 @@ export function DesktopHero() {
               fill
               priority
               sizes="100vw"
+              data-loader-critical
               className="object-cover object-center"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,30,26,0.24),rgba(30,30,26,0.06)_26%,rgba(30,30,26,0.12)_56%,rgba(30,30,26,0.28)_100%)]" />
