@@ -545,7 +545,8 @@ export const findUs = {
 };
 
 export const googleReviewCta = {
-  href: "https://www.google.com/maps/search/?api=1&query=USCO+CAFE+Shahpur+Jat+New+Delhi",
+  href: "https://www.google.com/search?hl=en-IN&gl=in&q=USCO+CAFE+Shahpur+Jat#lrd=0x390ce34ee3b5c2d5:0xc861a88ed99ee032,3,,,",
+  mobileHref: "https://www.google.com/maps?cid=14441334767921663538#lrd=0x390ce34ee3b5c2d5:0xc861a88ed99ee032,3,,,",
   ratingLabel: "4.7 on Google",
   visitorLabel: "139+ happy visitors",
 };

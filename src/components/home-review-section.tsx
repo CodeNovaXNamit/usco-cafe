@@ -1,3 +1,5 @@
+"use client";
+
 const reviewItems = [
   {
     emoji: "🍵",
@@ -27,11 +29,20 @@ const reviewItems = [
 
 type HomeReviewSectionProps = {
   reviewUrl: string;
+  mobileReviewUrl?: string;
   ratingLabel: string;
   visitorLabel: string;
 };
 
-export function HomeReviewSection({ reviewUrl, ratingLabel, visitorLabel }: HomeReviewSectionProps) {
+function isMobileDevice() {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+export function HomeReviewSection({ reviewUrl, mobileReviewUrl, ratingLabel, visitorLabel }: HomeReviewSectionProps) {
   const repeatedReviews = [...reviewItems, ...reviewItems];
 
   return (
@@ -71,6 +82,14 @@ export function HomeReviewSection({ reviewUrl, ratingLabel, visitorLabel }: Home
               href={reviewUrl}
               target="_blank"
               rel="noreferrer"
+              onClick={(event) => {
+                if (!mobileReviewUrl || !isMobileDevice()) {
+                  return;
+                }
+
+                event.preventDefault();
+                window.open(mobileReviewUrl, "_blank", "noopener,noreferrer");
+              }}
               className="home-motion-text home-motion-text--drift inline-flex min-h-11 items-center justify-center rounded-full border border-matcha-deep/18 bg-matcha-deep px-5 py-3 font-sans text-[10px] uppercase tracking-[0.24em] text-white hover:scale-[1.02] hover:bg-matcha-deep/92 sm:text-[11px]"
             >
               Write a Google Review
