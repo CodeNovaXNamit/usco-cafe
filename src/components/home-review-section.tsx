@@ -44,6 +44,7 @@ function isMobileDevice() {
 
 export function HomeReviewSection({ reviewUrl, mobileReviewUrl, ratingLabel, visitorLabel }: HomeReviewSectionProps) {
   const repeatedReviews = [...reviewItems, ...reviewItems];
+  const resolvedReviewUrl = mobileReviewUrl && isMobileDevice() ? mobileReviewUrl : reviewUrl;
 
   return (
     <section className="px-4 pb-14 sm:px-6 sm:pb-24 lg:px-10">
@@ -79,17 +80,9 @@ export function HomeReviewSection({ reviewUrl, mobileReviewUrl, ratingLabel, vis
             </div>
 
             <a
-              href={reviewUrl}
+              href={resolvedReviewUrl}
               target="_blank"
               rel="noreferrer"
-              onClick={(event) => {
-                if (!mobileReviewUrl || !isMobileDevice()) {
-                  return;
-                }
-
-                event.preventDefault();
-                window.open(mobileReviewUrl, "_blank", "noopener,noreferrer");
-              }}
               className="home-motion-text home-motion-text--drift inline-flex min-h-11 items-center justify-center rounded-full border border-matcha-deep/18 bg-matcha-deep px-5 py-3 font-sans text-[10px] uppercase tracking-[0.24em] text-white hover:scale-[1.02] hover:bg-matcha-deep/92 sm:text-[11px]"
             >
               Write a Google Review
