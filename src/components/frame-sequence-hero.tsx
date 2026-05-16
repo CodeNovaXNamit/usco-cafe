@@ -9,274 +9,100 @@ function getFrameUrl(index: number) {
   return getFrameAssetUrl(index);
 }
 
-function getCoveredFrameBounds(
-  canvas: HTMLCanvasElement,
-  image: HTMLImageElement,
-) {
-  const { width, height } = canvas.getBoundingClientRect();
-  const imageRatio = image.width / image.height;
-  let drawWidth = width;
-  let drawHeight = width / imageRatio;
-
-  if (drawHeight < height) {
-    drawHeight = height;
-    drawWidth = drawHeight * imageRatio;
-  }
-
-  const offsetX = (width - drawWidth) / 2;
-  const offsetY = (height - drawHeight) / 2;
-
-  return { width, height, drawWidth, drawHeight, offsetX, offsetY };
+function clamp(value: number, min = 0, max = 1) {
+  return Math.min(max, Math.max(min, value));
 }
 
-function drawCoverImage(canvas: HTMLCanvasElement, image: HTMLImageElement, devicePixelRatio: number) {
+function drawCoverFrame(canvas: HTMLCanvasElement, image: HTMLImageElement) {
   const ctx = canvas.getContext("2d");
-
   if (!ctx) {
     return;
   }
 
-  const { width, height } = canvas.getBoundingClientRect();
-  canvas.width = Math.round(width * devicePixelRatio);
-  canvas.height = Math.round(height * devicePixelRatio);
-  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "#f6f3ec";
-  ctx.fillRect(0, 0, width, height);
+  const canvasRatio = canvas.width / canvas.height;
+  const imageRatio = image.width / image.height;
 
-  const { drawWidth, drawHeight, offsetX, offsetY } = getCoveredFrameBounds(canvas, image);
+  let drawWidth = 0;
+  let drawHeight = 0;
+  let offsetX = 0;
+  let offsetY = 0;
 
+  if (imageRatio > canvasRatio) {
+    drawHeight = canvas.height;
+    drawWidth = image.width * (canvas.height / image.height);
+    offsetX = (canvas.width - drawWidth) / 2;
+  } else {
+    drawWidth = canvas.width;
+    drawHeight = image.height * (canvas.width / image.width);
+    offsetY = (canvas.height - drawHeight) / 2;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
 
-function drawCoverImages(
-  canvas: HTMLCanvasElement,
-  currentImage: HTMLImageElement,
-  nextImage: HTMLImageElement | null,
-  blend: number,
-  devicePixelRatio: number,
-) {
-  drawCoverImage(canvas, currentImage, devicePixelRatio);
-
-  if (!nextImage || blend <= 0) {
-    return;
-  }
-
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) {
-    return;
-  }
-
-  const { drawWidth, drawHeight, offsetX, offsetY } = getCoveredFrameBounds(canvas, nextImage);
-
-  ctx.save();
-  ctx.globalAlpha = blend;
-  ctx.drawImage(nextImage, offsetX, offsetY, drawWidth, drawHeight);
-  ctx.restore();
-}
-
-function detectForegroundMode(canvas: HTMLCanvasElement) {
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-  if (!ctx) {
-    return "light" as const;
-  }
-
-  const { width, height } = canvas;
-  if (width === 0 || height === 0) {
-    return "light" as const;
-  }
-
-  const sampleSize = 24;
-  const startX = Math.max(Math.floor(width * 0.16), 0);
-  const startY = Math.max(Math.floor(height * 0.14), 0);
-  const sampleWidth = Math.min(sampleSize, Math.max(width - startX, 1));
-  const sampleHeight = Math.min(sampleSize, Math.max(height - startY, 1));
-  const pixels = ctx.getImageData(startX, startY, sampleWidth, sampleHeight).data;
-
-  let totalLuma = 0;
-  let count = 0;
-
-  for (let index = 0; index < pixels.length; index += 16) {
-    const red = pixels[index] ?? 0;
-    const green = pixels[index + 1] ?? 0;
-    const blue = pixels[index + 2] ?? 0;
-    totalLuma += red * 0.299 + green * 0.587 + blue * 0.114;
-    count += 1;
-  }
-
-  const averageLuma = count > 0 ? totalLuma / count : 0;
-  return averageLuma > 150 ? ("dark" as const) : ("light" as const);
-}
-
-function sampleCharacterTone(
-  canvas: HTMLCanvasElement,
-  element: HTMLSpanElement,
-  container: HTMLDivElement,
-) {
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-  if (!ctx) {
-    return "text-white";
-  }
-
-  const charRect = element.getBoundingClientRect();
-  const containerRect = container.getBoundingClientRect();
-  const scaleX = canvas.width / Math.max(containerRect.width, 1);
-  const scaleY = canvas.height / Math.max(containerRect.height, 1);
-  const sampleX = Math.max(Math.floor((charRect.left - containerRect.left) * scaleX), 0);
-  const sampleY = Math.max(Math.floor((charRect.top - containerRect.top) * scaleY), 0);
-  const sampleWidth = Math.max(Math.floor(charRect.width * scaleX), 1);
-  const sampleHeight = Math.max(Math.floor(charRect.height * scaleY), 1);
-  const safeWidth = Math.min(sampleWidth, Math.max(canvas.width - sampleX, 1));
-  const safeHeight = Math.min(sampleHeight, Math.max(canvas.height - sampleY, 1));
-  const pixels = ctx.getImageData(sampleX, sampleY, safeWidth, safeHeight).data;
-
-  let totalLuma = 0;
-  let count = 0;
-
-  for (let index = 0; index < pixels.length; index += 16) {
-    const red = pixels[index] ?? 0;
-    const green = pixels[index + 1] ?? 0;
-    const blue = pixels[index + 2] ?? 0;
-    totalLuma += red * 0.299 + green * 0.587 + blue * 0.114;
-    count += 1;
-  }
-
-  const averageLuma = count > 0 ? totalLuma / count : 0;
-
-  if (averageLuma > 170) {
-    return "text-black";
-  }
-
-  if (averageLuma > 100) {
-    return "text-matcha-mid";
-  }
-
-  return "text-white";
-}
-
 export function FrameSequenceHero() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  // Desktop-only component: keep this mount isolated from phones because it preloads all WebP frames.
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const pinRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const textLayerRef = useRef<HTMLDivElement | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [loadedCount, setLoadedCount] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [foregroundMode, setForegroundMode] = useState<"dark" | "light">("light");
-  const [brandColors, setBrandColors] = useState<string[]>([]);
-  const [taglineColors, setTaglineColors] = useState<string[]>([]);
-  const [kickerColors, setKickerColors] = useState<string[]>([]);
-  const [lineColors, setLineColors] = useState<string[]>([]);
-  const [asideColors, setAsideColors] = useState<string[]>([]);
+  const startOverlayRef = useRef<HTMLDivElement | null>(null);
+  const endOverlayRef = useRef<HTMLDivElement | null>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
-  const devicePixelRatioRef = useRef(1);
-  const scrollAnimationRef = useRef<number | null>(null);
-  const targetProgressRef = useRef(0);
-  const progressRef = useRef(0);
-  const visualSampleRef = useRef({ key: -1, time: 0 });
-  const foregroundModeRef = useRef<"dark" | "light">("light");
-  const posterFrameIndex = 0;
-  const overlay = useMemo(() => {
-    if (progress < 0.2) {
-      return {
-        kicker: "Coffee + Quiet",
-        line: "A narrow door. A warm light. Come in.",
-        cta: isMobile ? "Explore Menu" : "Scroll slowly",
-      };
-    }
+  const [loadedCount, setLoadedCount] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [pinMode, setPinMode] = useState<"before" | "fixed" | "bottom">("before");
+  const hasLoggedFrameInfoRef = useRef(false);
+  const debugFrameRef = useRef<number | null>(null);
+  const hasLoggedDebugFrameRef = useRef(false);
 
-    if (progress < 0.75) {
-      return {
-        kicker: "Somewhere between your first sip and your last thought.",
-        line: "The walk in becomes part of the ritual.",
-        cta: isMobile ? "Explore Menu" : "Keep going",
-      };
-    }
-
-    return {
-      kicker: "At No. 4",
-      line: "The door is usually open.",
-      cta: "Explore",
-    };
-  }, [isMobile, progress]);
-
-  const taglineText = "Coffee + Quiet";
-  const asideText = "No. 4 / Warm light ahead";
-
-  const applyCharacterColors = (
-    group: string,
-    setColors: React.Dispatch<React.SetStateAction<string[]>>,
-  ) => {
-    if (!canvasRef.current || !textLayerRef.current) {
+  useEffect(() => {
+    if (typeof window === "undefined") {
       return;
     }
 
-    const nextColors = Array.from(
-      textLayerRef.current.querySelectorAll<HTMLSpanElement>(`[data-char-group="${group}"]`),
-    ).map((element) => {
-      if (!element || element.dataset.space === "true") {
-        return "";
-      }
+    const params = new URLSearchParams(window.location.search);
+    const debugFrameParam = params.get("debugFrame");
 
-      return sampleCharacterTone(canvasRef.current as HTMLCanvasElement, element, textLayerRef.current as HTMLDivElement);
-    });
+    if (debugFrameParam === null) {
+      debugFrameRef.current = null;
+      return;
+    }
 
-    setColors((current) => {
-      if (current.length === nextColors.length && current.every((value, index) => value === nextColors[index])) {
-        return current;
-      }
+    const parsed = Number(debugFrameParam);
+    const safeFrame = Number.isFinite(parsed)
+      ? Math.max(0, Math.min(totalFrames - 1, Math.floor(parsed)))
+      : 0;
+    debugFrameRef.current = safeFrame;
 
-      return nextColors;
-    });
-  };
-
-  const renderCharacterText = (
-    text: string,
-    group: string,
-    colors: string[],
-    className: string,
-  ) =>
-    text.split("").map((character, index) => (
-      <span
-        key={`${text}-${index}-${character === " " ? "space" : character}`}
-        data-char-group={group}
-        data-char-index={index}
-        data-space={character === " " ? "true" : "false"}
-        className={`${className} ${character === " " ? "inline-block w-[0.28em]" : colors[index] ?? "text-white"}`}
-      >
-        {character === " " ? "\u00A0" : character}
-      </span>
-    ));
-
-  const useCharacterContrast = !isMobile && !reducedMotion;
+    if (process.env.NODE_ENV !== "production" && !hasLoggedDebugFrameRef.current) {
+      hasLoggedDebugFrameRef.current = true;
+      console.log({ debugFrameLocked: safeFrame });
+    }
+  }, []);
 
   useEffect(() => {
-    const media = window.matchMedia("(max-width: 767px)");
+    if (process.env.NODE_ENV === "production" || hasLoggedFrameInfoRef.current) {
+      return;
+    }
+
+    hasLoggedFrameInfoRef.current = true;
+    console.log({
+      totalFrames,
+      firstFrame: getFrameUrl(0),
+      lastFrame: getFrameUrl(totalFrames - 1),
+    });
+  }, []);
+
+  useEffect(() => {
     const motionMedia = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updateMedia = () => {
-      const nextIsMobile = media.matches;
-      setIsMobile(nextIsMobile);
-      setReducedMotion(motionMedia.matches);
+    const updateMotion = () => setReducedMotion(motionMedia.matches);
 
-      if (!nextIsMobile) {
-        setProgress(0);
-        progressRef.current = 0;
-        targetProgressRef.current = 0;
-      }
-    };
-
-    updateMedia();
-    media.addEventListener("change", updateMedia);
-    motionMedia.addEventListener("change", updateMedia);
+    updateMotion();
+    motionMedia.addEventListener("change", updateMotion);
 
     return () => {
-      media.removeEventListener("change", updateMedia);
-      motionMedia.removeEventListener("change", updateMedia);
+      motionMedia.removeEventListener("change", updateMotion);
     };
   }, []);
 
@@ -301,182 +127,143 @@ export function FrameSequenceHero() {
         imagesRef.current[index] = image;
         loaded += 1;
         setLoadedCount(loaded);
-
-        if (loaded === 1 && canvasRef.current) {
-          drawCoverImage(canvasRef.current, image, devicePixelRatioRef.current);
-          const nextMode = detectForegroundMode(canvasRef.current);
-          foregroundModeRef.current = nextMode;
-          setForegroundMode(nextMode);
-
-          if (useCharacterContrast) {
-            applyCharacterColors("brand", setBrandColors);
-            applyCharacterColors("tagline", setTaglineColors);
-            applyCharacterColors("kicker", setKickerColors);
-            applyCharacterColors("line", setLineColors);
-            applyCharacterColors("aside", setAsideColors);
-          }
-        }
       };
     }
 
     return () => {
       cancelled = true;
     };
-  }, [reducedMotion, useCharacterContrast]);
+  }, [reducedMotion]);
 
   useEffect(() => {
-    devicePixelRatioRef.current = Math.min(window.devicePixelRatio || 1, isMobile ? 1.2 : 1.35);
-
     if (reducedMotion) {
       return;
     }
 
-    const updateProgress = () => {
-      const container = containerRef.current;
+    const section = sectionRef.current;
+    const pin = pinRef.current;
+    const canvas = canvasRef.current;
+    const startOverlay = startOverlayRef.current;
+    const endOverlay = endOverlayRef.current;
+    if (!section || !pin || !canvas || !startOverlay || !endOverlay) {
+      return;
+    }
 
-      if (!container) {
-        return;
-      }
+    let raf = 0;
 
-      const headerHeight =
-        document.querySelector<HTMLElement>(".site-header")?.getBoundingClientRect().height ??
-        (window.innerWidth >= 640 ? 72 : 64);
-      const rect = container.getBoundingClientRect();
-      const stickyViewportHeight = Math.max(window.innerHeight - headerHeight, 1);
-      const total = Math.max(container.offsetHeight - stickyViewportHeight, 1);
-      const nextProgress = Math.min(Math.max((headerHeight - rect.top) / total, 0), 1);
-      targetProgressRef.current = nextProgress;
+    const resizeCanvasToPin = () => {
+      const rect = pin.getBoundingClientRect();
+      const width = Math.max(Math.round(rect.width), 1);
+      const height = Math.max(Math.round(rect.height), 1);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      if (scrollAnimationRef.current) {
-        return;
-      }
-
-      const animate = () => {
-        const currentProgress = progressRef.current;
-        const delta = targetProgressRef.current - currentProgress;
-        const easing = isMobile ? 0.085 : 0.11;
-
-        if (Math.abs(delta) < 0.0015) {
-          progressRef.current = targetProgressRef.current;
-          setProgress(targetProgressRef.current);
-          scrollAnimationRef.current = null;
-          return;
-        }
-
-        const nextValue = currentProgress + delta * easing;
-        progressRef.current = nextValue;
-        setProgress(nextValue);
-        scrollAnimationRef.current = window.requestAnimationFrame(animate);
-      };
-
-      scrollAnimationRef.current = window.requestAnimationFrame(animate);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
     };
 
-    updateProgress();
-    let scrollFrame = 0;
+    const renderCurrentFrame = () => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const scrollableDistance = Math.max(sectionHeight - viewportHeight, 1);
+      const localScroll = window.scrollY - sectionTop;
+      const rawProgress = localScroll / scrollableDistance;
+      const nextProgress = clamp(rawProgress);
 
-    const onScroll = () => {
-      if (scrollFrame) {
+      if (window.scrollY < sectionTop) {
+        setPinMode("before");
+      } else if (window.scrollY <= sectionTop + scrollableDistance) {
+        setPinMode("fixed");
+      } else {
+        setPinMode("bottom");
+      }
+
+      const frameIndex = debugFrameRef.current !== null
+        ? debugFrameRef.current
+        : Math.min(
+            totalFrames - 1,
+            Math.floor(nextProgress * (totalFrames - 1)),
+          );
+      const frame = imagesRef.current[frameIndex];
+
+      if (!frame) {
         return;
       }
 
-      scrollFrame = window.requestAnimationFrame(() => {
-        scrollFrame = 0;
-        updateProgress();
+      drawCoverFrame(canvas, frame);
+
+      const startExit = clamp(nextProgress / 0.14);
+      const startOpacity = 1 - startExit;
+      const startY = -90 * startExit;
+      const startBlur = 8 * startExit;
+      const startScale = 1 - 0.04 * startExit;
+
+      startOverlay.style.opacity = String(startOpacity);
+      startOverlay.style.transform = `translate3d(0, ${startY}px, 0) scale(${startScale})`;
+      startOverlay.style.filter = `blur(${startBlur}px)`;
+      startOverlay.style.pointerEvents = startOpacity > 0.2 ? "auto" : "none";
+
+      const endEnter = clamp((nextProgress - 0.78) / 0.16);
+      const easedEnd = 1 - Math.pow(1 - endEnter, 3);
+      const endOpacity = easedEnd;
+      const endY = 55 * (1 - easedEnd);
+      const endScale = 0.94 + 0.06 * easedEnd;
+      const endBlur = 10 * (1 - easedEnd);
+
+      endOverlay.style.opacity = String(endOpacity);
+      endOverlay.style.transform = `translate3d(0, ${endY}px, 0) scale(${endScale})`;
+      endOverlay.style.filter = `blur(${endBlur}px)`;
+      endOverlay.style.pointerEvents = endOpacity > 0.6 ? "auto" : "none";
+    };
+
+    const scheduleRender = () => {
+      if (raf) {
+        return;
+      }
+
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        renderCurrentFrame();
       });
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", updateProgress);
+    const onResize = () => {
+      resizeCanvasToPin();
+      scheduleRender();
+    };
+
+    resizeCanvasToPin();
+    renderCurrentFrame();
+
+    window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", scheduleRender, { passive: true });
 
     return () => {
-      if (scrollAnimationRef.current) {
-        window.cancelAnimationFrame(scrollAnimationRef.current);
-        scrollAnimationRef.current = null;
+      if (raf) {
+        window.cancelAnimationFrame(raf);
       }
-
-      if (scrollFrame) {
-        window.cancelAnimationFrame(scrollFrame);
-      }
-
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", updateProgress);
+      window.removeEventListener("scroll", scheduleRender);
+      window.removeEventListener("resize", onResize);
     };
-  }, [isMobile, reducedMotion]);
-
-  useEffect(() => {
-    if (reducedMotion) {
-      return;
-    }
-
-    const canvas = canvasRef.current;
-
-    if (!canvas) {
-      return;
-    }
-
-    const exactFrame = progress * (totalFrames - 1);
-    const currentIndex = Math.floor(exactFrame);
-    const blend = exactFrame - currentIndex;
-    const currentImage = imagesRef.current[Math.min(currentIndex, totalFrames - 1)];
-    const nextImage = imagesRef.current[Math.min(currentIndex + 1, totalFrames - 1)];
-
-    if (!currentImage) {
-      return;
-    }
-
-    drawCoverImages(canvas, currentImage, nextImage ?? null, blend, devicePixelRatioRef.current);
-
-    const sampleKey = Math.round(exactFrame * (isMobile ? 3 : 2));
-    const now = performance.now();
-    const shouldRefreshVisualSampling =
-      sampleKey !== visualSampleRef.current.key || now - visualSampleRef.current.time >= 160;
-
-    if (shouldRefreshVisualSampling) {
-      visualSampleRef.current = { key: sampleKey, time: now };
-
-      const nextMode = detectForegroundMode(canvas);
-      if (nextMode !== foregroundModeRef.current) {
-        foregroundModeRef.current = nextMode;
-        setForegroundMode(nextMode);
-      }
-
-      if (useCharacterContrast) {
-        applyCharacterColors("brand", setBrandColors);
-        applyCharacterColors("tagline", setTaglineColors);
-        applyCharacterColors("kicker", setKickerColors);
-        applyCharacterColors("line", setLineColors);
-        applyCharacterColors("aside", setAsideColors);
-      }
-    }
-  }, [isMobile, loadedCount, progress, reducedMotion, useCharacterContrast]);
-
-  const scrollStep = () => {
-    window.scrollBy({
-      top: Math.max(window.innerHeight * (isMobile ? 0.42 : 0.88), 220),
-      behavior: "smooth",
-    });
-  };
+  }, [loadedCount, reducedMotion]);
 
   const ready = reducedMotion || loadedCount >= totalFrames;
   const loadingProgress = reducedMotion ? 100 : Math.round((loadedCount / totalFrames) * 100);
-  const heroHeightClass = reducedMotion
-    ? "h-[calc(100svh+2.5rem)]"
-    : isMobile
-      ? "h-[240svh]"
-      : "h-[560vh] xl:h-[600vh]";
-  const usesDarkForeground = foregroundMode === "dark";
-  const primaryTextClass = usesDarkForeground ? "text-matcha-deep" : "text-white";
-  const accentTextClass = usesDarkForeground ? "text-matcha-mid" : "text-white/88";
-  const asideTextClass = usesDarkForeground ? "text-matcha-deep/80" : "text-white/82";
-  const buttonClass = usesDarkForeground
-    ? "border-matcha-deep/20 bg-white/88 text-matcha-deep hover:bg-white"
-    : "border-white/50 bg-white/20 text-white hover:bg-white/30";
-  const secondaryLinkClass = usesDarkForeground ? "text-matcha-deep/80 hover:text-matcha-deep" : "text-white/85 hover:text-white";
+  const pinClassName = useMemo(() => {
+    if (pinMode === "fixed") {
+      return "frame-sequence-pin is-fixed";
+    }
+    if (pinMode === "bottom") {
+      return "frame-sequence-pin is-bottom";
+    }
+    return "frame-sequence-pin";
+  }, [pinMode]);
 
   return (
-    <section ref={containerRef} className={`home-hero ${heroHeightClass}`}>
-      <div className="home-hero__viewport">
+    <section ref={sectionRef} className={`frame-sequence-section ${reducedMotion ? "frame-sequence-section--reduced" : ""}`}>
+      <div ref={pinRef} className={pinClassName}>
         {!ready ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white text-matcha-deep">
             <div className="px-4 text-center font-display text-5xl tracking-[0.12em] sm:text-6xl">USCO</div>
@@ -493,91 +280,41 @@ export function FrameSequenceHero() {
         ) : null}
 
         {reducedMotion ? (
-          <div className="home-hero__media absolute inset-0">
-            <img
-              src={getFrameUrl(posterFrameIndex)}
-              alt="USCO cafe exterior"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          </div>
+          <img
+            src={getFrameUrl(0)}
+            alt="USCO cafe exterior"
+            className="frame-sequence-canvas object-cover"
+          />
         ) : (
-          <div className="home-hero__media absolute inset-0">
-            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
-          </div>
+          <canvas ref={canvasRef} className="frame-sequence-canvas" aria-hidden />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-white/82 via-white/18 to-black/26" />
+        <div className="frame-sequence-vignette" aria-hidden="true" />
 
-        <div
-          ref={textLayerRef}
-          className="absolute inset-0 pointer-events-none"
-        >
-          <div className="absolute left-4 right-4 top-6 flex items-start justify-between sm:left-8 sm:right-8 sm:top-8">
-          <div>
-            <div
-              className={`font-display text-4xl tracking-[0.08em] sm:text-6xl ${useCharacterContrast ? "" : primaryTextClass}`}
-            >
-              {useCharacterContrast ? renderCharacterText("USCO", "brand", brandColors, "transition-colors duration-300") : "USCO"}
-            </div>
-            <div
-              className={`font-accent text-[10px] uppercase tracking-[0.38em] sm:text-sm ${useCharacterContrast ? "" : accentTextClass}`}
-            >
-              {useCharacterContrast ? renderCharacterText(taglineText, "tagline", taglineColors, "transition-colors duration-300") : taglineText}
-            </div>
-          </div>
-          <div
-            className={`hidden font-sans text-xs uppercase tracking-[0.25em] sm:block ${useCharacterContrast ? "" : asideTextClass}`}
-          >
-            {useCharacterContrast ? renderCharacterText(asideText, "aside", asideColors, "transition-colors duration-300") : asideText}
-          </div>
+        <div ref={startOverlayRef} className="frame-sequence-start-overlay">
+          <article className="frame-glass-card frame-glass-card--left">
+            <p className="frame-glass-kicker">COFFEE + QUIET</p>
+            <h2>Somewhere softer than the usual rush.</h2>
+            <p>A calm little stop in Shahpur Jat for slow sips, warm lights, and quiet conversations.</p>
+          </article>
+
+          <article className="frame-glass-card frame-glass-card--right">
+            <p className="frame-glass-kicker">USCO RITUAL</p>
+            <h2>Walk in slow. Leave lighter.</h2>
+            <p>From matcha mornings to evening coffee, the space is made to feel peaceful before the first sip.</p>
+          </article>
         </div>
 
-        <div className="absolute inset-x-0 bottom-8 px-4 sm:bottom-14 sm:px-8">
-          <div className="mx-auto max-w-5xl">
-            <div className="max-w-3xl p-0 pointer-events-auto">
-              <p
-                className={`font-sans text-[10px] uppercase tracking-[0.28em] sm:text-xs ${useCharacterContrast ? "" : accentTextClass}`}
-              >
-                {useCharacterContrast ? renderCharacterText(overlay.kicker, "kicker", kickerColors, "transition-colors duration-300") : overlay.kicker}
-              </p>
-              <h1
-                className={`mt-3 max-w-3xl text-balance font-display text-[2.35rem] leading-[0.95] sm:mt-4 sm:text-7xl lg:text-[6rem] ${useCharacterContrast ? "" : primaryTextClass}`}
-              >
-                {useCharacterContrast ? renderCharacterText(overlay.line, "line", lineColors, "transition-colors duration-300") : overlay.line}
-              </h1>
-              <div className="mt-6 flex flex-col items-start gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
-                <Link
-                  href="/menu"
-                  className={`inline-flex min-h-11 w-full items-center justify-center rounded-full border px-5 py-3 font-sans text-[11px] uppercase tracking-[0.28em] transition-[transform,color,background-color,border-color] duration-300 hover:scale-[1.02] sm:w-auto sm:px-6 sm:text-xs ${buttonClass}`}
-                >
-                  {overlay.cta}
-                </Link>
-                <Link
-                  href="/find-us"
-                  className={`font-sans text-[11px] uppercase tracking-[0.28em] transition-colors duration-300 sm:text-xs ${secondaryLinkClass}`}
-                >
-                  Find Us
-                </Link>
-              </div>
-              <button
-                type="button"
-                onClick={scrollStep}
-                className={`mt-5 inline-flex min-h-10 items-center gap-2 rounded-full border px-4 py-2 font-sans text-[10px] uppercase tracking-[0.3em] transition-[color,background-color,border-color] duration-300 sm:mt-6 sm:text-[11px] ${
-                  usesDarkForeground
-                    ? "border-matcha-deep/20 bg-white/82 text-matcha-deep hover:bg-white"
-                    : "border-white/35 bg-black/12 text-white/88 hover:bg-black/20"
-                }`}
-              >
-                <span>{isMobile ? "See More" : "Scroll"}</span>
-                <span
-                  className={`hero-scroll-cue block h-3.5 w-3.5 rounded-full ${
-                    usesDarkForeground ? "border border-matcha-deep/35" : "border border-white/55"
-                  }`}
-                />
-              </button>
+        <div ref={endOverlayRef} className="frame-sequence-end-overlay">
+          <article className="frame-glass-card frame-glass-card--end">
+            <p className="frame-glass-kicker">A LITTLE CUP FOR YOU</p>
+            <h2>Coffee for you.</h2>
+            <p>Hot, iced, creamy, quiet - pick the mood and let the day slow down for a minute.</p>
+            <div className="frame-glass-actions">
+              <Link href="/menu">Explore Menu</Link>
+              <Link href="/find-us">Find Us</Link>
             </div>
-          </div>
-        </div>
+          </article>
         </div>
       </div>
     </section>

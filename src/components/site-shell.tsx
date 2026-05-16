@@ -13,19 +13,18 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
 
   return (
     <div className={`site-shell min-h-screen text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
-      <header className="site-header border-b border-matcha-light/70">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-10">
-          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3 text-matcha-deep">
-            <span className="font-display text-[1.65rem] tracking-[0.08em] sm:text-3xl">USCO</span>
-            <span className="hidden h-10 w-px bg-matcha-light/80 sm:block" aria-hidden="true" />
-            <span className="hidden min-w-0 sm:flex sm:flex-col">
-              <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-matcha-mid">Coffee + Quiet</span>
-              <span className="font-serif text-sm italic text-matcha-deep/72">A slower cup in Shahpur Jat</span>
+      <header className={`site-header ${isHomePage ? "site-header--home" : "border-b border-matcha-light/70"}`}>
+        <div className="site-header-shell">
+          <Link href="/" className="site-brand">
+            <span className="site-brand-logo">USCO</span>
+            <span className="site-brand-copy">
+              <span>Coffee + Quiet</span>
+              <em>A slower cup in Shahpur Jat</em>
             </span>
           </Link>
           <nav
             aria-label="Primary"
-            className="header-glass-nav flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto rounded-full px-1.5 py-1.5 text-matcha-deep sm:gap-1 sm:px-2"
+            className="site-nav header-glass-nav"
           >
             {navLinks.map((link) => {
               const active = currentPath === link.href;
@@ -34,16 +33,15 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`header-glass-link relative min-w-0 rounded-full px-2.5 py-1.5 text-center font-sans text-[9px] uppercase tracking-[0.16em] sm:px-3 sm:py-2 sm:text-[10px] sm:tracking-[0.18em] ${
-                    active ? "is-active bg-white/68 text-matcha-deep" : "text-matcha-deep/82 hover:text-matcha-deep"
-                  }`}
+                  aria-current={active ? "page" : undefined}
+                  className={`header-glass-link ${active ? "is-active" : ""}`}
                 >
                   {link.label}
                 </Link>
               );
             })}
           </nav>
-          <div className="hidden shrink-0 rounded-full border border-matcha-light/60 bg-white/46 px-4 py-2 font-sans text-[11px] uppercase tracking-[0.18em] text-matcha-mid shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] xl:block">
+          <div className="site-status-pill">
             Open Today / 10am-8pm
           </div>
         </div>

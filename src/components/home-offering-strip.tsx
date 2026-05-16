@@ -53,19 +53,59 @@ function OfferingRow({
 
 export function HomeOfferingStrip({ items }: HomeOfferingStripProps) {
   const secondRow = [...items.slice(Math.floor(items.length / 2)), ...items.slice(0, Math.floor(items.length / 2))];
+  const desktopFirstRow = [...items, ...items];
+  const desktopSecondRow = [...secondRow, ...secondRow];
 
   return (
-    <section className="overflow-hidden bg-matcha-light py-5 sm:py-6">
-      <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-[#f8f6f1] via-[#f8f6f1]/80 to-transparent sm:w-24" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-[#f8f6f1] via-[#f8f6f1]/80 to-transparent sm:w-24" />
-        <div className="absolute inset-x-0 top-0 h-px bg-white/45" />
-        <div className="absolute inset-x-0 bottom-0 h-px bg-matcha-deep/10" />
-        <div className="space-y-7 sm:space-y-9">
-          <OfferingRow items={items} direction="left" />
-          <OfferingRow items={secondRow} direction="right" />
+    <>
+      <section className="overflow-hidden bg-matcha-light py-5 sm:py-6 lg:hidden">
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-[#f8f6f1] via-[#f8f6f1]/80 to-transparent sm:w-24" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-[#f8f6f1] via-[#f8f6f1]/80 to-transparent sm:w-24" />
+          <div className="absolute inset-x-0 top-0 h-px bg-white/45" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-matcha-deep/10" />
+          <div className="space-y-7 sm:space-y-9">
+            <OfferingRow items={items} direction="left" />
+            <OfferingRow items={secondRow} direction="right" />
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section className="offering-runway-section hidden lg:block" aria-label="USCO menu glimpses">
+        <div className="offering-runway-shell">
+          <div className="offering-runway-header">
+            <div>
+              <p className="home-section-kicker">Menu Glimpses</p>
+              <h2>A few little reasons to stay longer.</h2>
+            </div>
+            <p>Small comforts, quiet flavors, and cups that ask for one more minute.</p>
+          </div>
+
+          <div className="offering-runway-frame">
+            <div className="offering-runway-row offering-runway-row--left">
+              {desktopFirstRow.map((item, index) => (
+                <Link key={`${item.id}-runway-left-${index}`} href={item.href} className="offering-runway-item">
+                  <div className="offering-runway-orb">
+                    <img src={item.image} alt={item.name} />
+                  </div>
+                  <span className="offering-runway-label">{item.name}</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="offering-runway-row offering-runway-row--right">
+              {desktopSecondRow.map((item, index) => (
+                <Link key={`${item.id}-runway-right-${index}`} href={item.href} className="offering-runway-item">
+                  <div className="offering-runway-orb">
+                    <img src={item.image} alt={item.name} />
+                  </div>
+                  <span className="offering-runway-label">{item.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { HomeOfferingStrip } from "@/components/home-offering-strip";
 import { HomeReviewSection } from "@/components/home-review-section";
 import {
@@ -21,37 +20,38 @@ export default function PhoneHome() {
         className="px-4 pb-10 pt-8"
       />
       <HomeOfferingStrip items={homeOfferingStripItems} />
-      <section className="px-4 py-6">
-        <div className="relative overflow-hidden rounded-[28px] border border-white/60 bg-white/70 shadow-[0_18px_50px_rgba(74,94,56,0.08)]">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="block aspect-[4/5] h-full w-full object-cover"
-          >
-            <source src="/media/phone/coffee-home.mp4" type="video/mp4" />
-          </video>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(30,30,26,0)_34%,rgba(30,30,26,0.14)_68%,rgba(30,30,26,0.38)_100%)]" />
-        </div>
-      </section>
-      <section className="px-4 pb-4">
-        <MotionInView direction="left" delay="0.04s" className="rounded-[30px]">
-          <div className="phone-speciality-card overflow-hidden rounded-[30px] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(248,246,241,0.22))] p-5 text-matcha-deep shadow-[0_22px_55px_rgba(74,94,56,0.14)] backdrop-blur-xl">
-            <p className="home-motion-text font-sans text-[0.64rem] uppercase tracking-[0.3em] text-matcha-mid/90" style={{ "--motion-delay": "0.08s" } as CSSProperties}>
-              Some Of Our Speciality
-            </p>
-            <h3 className="home-motion-text mt-3 font-display text-[2rem] leading-[0.95] text-matcha-deep" style={{ "--motion-delay": "0.16s" } as CSSProperties}>
-              Coffee that feels like your coffee.
-            </h3>
-            <p className="home-motion-text mt-3 max-w-sm text-sm leading-6 text-charcoal/78" style={{ "--motion-delay": "0.24s" } as CSSProperties}>
-              Slow pours, soft milk, deeper roasts, and the kind of cup that makes you stay for one more minute.
-            </p>
-            <div className="home-motion-text mt-5 inline-flex rounded-full border border-white/70 bg-white/46 px-4 py-2 font-sans text-[0.68rem] uppercase tracking-[0.22em] text-matcha-deep shadow-[0_10px_24px_rgba(74,94,56,0.08)]" style={{ "--motion-delay": "0.32s" } as CSSProperties}>
-              Made for quiet mornings and slower evenings
+      <section className="phone-story-section relative px-4 pb-9 pt-4">
+        <MotionInView direction="left" delay="0.04s">
+          <article className="phone-story-card phone-story-card--coffee relative isolate">
+            <div className="phone-story-media relative h-[min(132vw,560px)] min-h-[470px] overflow-hidden rounded-[32px] border border-white/60 bg-white/50 shadow-[0_24px_68px_rgba(55,70,48,0.16)]">
+              <video
+                className="phone-story-video h-full w-full object-cover"
+                src="/media/phone/coffee-home.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              />
             </div>
-          </div>
+            <div className="phone-story-copy relative z-10 mx-[0.45rem] -mt-10 rounded-[30px] border border-white/80 bg-white/80 px-5 py-6 shadow-[0_22px_58px_rgba(55,70,48,0.14)] backdrop-blur-xl">
+              <span className="phone-story-index pointer-events-none absolute right-5 top-5 font-serif text-[2.6rem] leading-none text-[#7e9a68]/30">
+                01
+              </span>
+              <p className="phone-story-kicker m-0 text-[0.68rem] font-extrabold uppercase tracking-[0.24em] text-[#7e9a68]/75">
+                Some Of Our Speciality
+              </p>
+              <h2 className="phone-story-title mt-3 max-w-[92%] font-serif text-[clamp(2rem,10vw,3.2rem)] font-normal leading-none tracking-[-0.052em] text-[#526b4e]">
+                Coffee that feels like your coffee.
+              </h2>
+              <p className="phone-story-text mt-4 text-[0.98rem] leading-[1.75] text-[#3a3e34]/80">
+                Slow pours, soft milk, deeper roasts, and the kind of cup that makes you stay for one more minute.
+              </p>
+              <p className="phone-story-pill mt-5 inline-flex max-w-full rounded-full border border-white/70 bg-white/70 px-4 py-3 text-[0.66rem] font-extrabold uppercase leading-snug tracking-[0.2em] text-[#5b6f4e]/85">
+                Made for quiet mornings and slower evenings
+              </p>
+            </div>
+          </article>
         </MotionInView>
       </section>
       <HomePillarsSection
@@ -59,42 +59,41 @@ export default function PhoneHome() {
         gridClassName="mx-auto grid max-w-7xl gap-4"
         cardClassName="rounded-[24px] p-5"
       />
-      <section className="px-4 pb-4">
-        <div className="relative overflow-hidden rounded-[30px] border border-white/60 bg-white/70 shadow-[0_18px_50px_rgba(74,94,56,0.1)]">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="block aspect-[4/5] h-full w-full object-cover"
-          >
-            <source src="/media/phone/workspace-home.mp4" type="video/mp4" />
-          </video>
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(30,30,26,0.18),rgba(30,30,26,0.02)_36%,rgba(30,30,26,0.42)_100%)]" />
-          <div className="absolute left-4 top-4 rounded-full border border-white/30 bg-[rgba(248,246,241,0.18)] px-3 py-2 backdrop-blur-md">
-            <p className="font-sans text-[0.56rem] uppercase tracking-[0.28em] text-white/92">
-              Quiet Workspace
-            </p>
-          </div>
-        </div>
-      </section>
-      <section className="px-4 pb-4">
-        <MotionInView direction="right" delay="0.06s" className="rounded-[30px]">
-          <div className="phone-speciality-card overflow-hidden rounded-[30px] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(248,246,241,0.22))] p-5 text-matcha-deep shadow-[0_22px_55px_rgba(74,94,56,0.14)] backdrop-blur-xl">
-            <p className="home-motion-text font-sans text-[0.64rem] uppercase tracking-[0.3em] text-matcha-mid/90" style={{ "--motion-delay": "0.08s" } as CSSProperties}>
-              Work From Here
-            </p>
-            <h3 className="home-motion-text mt-3 font-display text-[2rem] leading-[0.95] text-matcha-deep" style={{ "--motion-delay": "0.16s" } as CSSProperties}>
-              A quiet table for deep work and slower hours.
-            </h3>
-            <p className="home-motion-text mt-3 max-w-sm text-sm leading-6 text-charcoal/78" style={{ "--motion-delay": "0.24s" } as CSSProperties}>
-              Settle in with coffee, let the room stay calm around you, and get through the work that needs a little peace.
-            </p>
-            <div className="home-motion-text mt-5 inline-flex rounded-full border border-white/70 bg-white/46 px-4 py-2 font-sans text-[0.68rem] uppercase tracking-[0.22em] text-matcha-deep shadow-[0_10px_24px_rgba(74,94,56,0.08)]" style={{ "--motion-delay": "0.32s" } as CSSProperties}>
-              Best for reading, writing, and long laptop sessions
+      <section className="phone-story-section relative px-4 pb-9 pt-4">
+        <MotionInView direction="right" delay="0.06s">
+          <article className="phone-story-card phone-story-card--workspace relative isolate">
+            <div className="phone-story-media relative h-[min(132vw,560px)] min-h-[470px] overflow-hidden rounded-[32px] border border-white/60 bg-white/50 shadow-[0_24px_68px_rgba(55,70,48,0.16)]">
+              <video
+                className="phone-story-video h-full w-full object-cover"
+                src="/media/phone/workspace-home.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              />
+              <span className="phone-story-media-badge absolute left-4 top-4 z-20 inline-flex min-h-[34px] items-center rounded-full border border-white/30 bg-[#142318]/40 px-4 text-[0.66rem] font-extrabold uppercase tracking-[0.2em] text-white/90 backdrop-blur-xl">
+                Quiet Workspace
+              </span>
             </div>
-          </div>
+            <div className="phone-story-copy relative z-10 mx-[0.45rem] -mt-10 rounded-[30px] border border-white/80 bg-white/80 px-5 py-6 shadow-[0_22px_58px_rgba(55,70,48,0.14)] backdrop-blur-xl">
+              <span className="phone-story-index pointer-events-none absolute right-5 top-5 font-serif text-[2.6rem] leading-none text-[#7e9a68]/30">
+                02
+              </span>
+              <p className="phone-story-kicker m-0 text-[0.68rem] font-extrabold uppercase tracking-[0.24em] text-[#7e9a68]/75">
+                Work From Here
+              </p>
+              <h2 className="phone-story-title mt-3 max-w-[92%] font-serif text-[clamp(2rem,10vw,3.2rem)] font-normal leading-none tracking-[-0.052em] text-[#526b4e]">
+                A quiet table for deep work and slower hours.
+              </h2>
+              <p className="phone-story-text mt-4 text-[0.98rem] leading-[1.75] text-[#3a3e34]/80">
+                Settle in with coffee, let the room stay calm around you, and get through the work that needs a little peace.
+              </p>
+              <p className="phone-story-pill mt-5 inline-flex max-w-full rounded-full border border-white/70 bg-white/70 px-4 py-3 text-[0.66rem] font-extrabold uppercase leading-snug tracking-[0.2em] text-[#5b6f4e]/85">
+                Best for reading, writing, and long laptop sessions
+              </p>
+            </div>
+          </article>
         </MotionInView>
       </section>
       <HomeExploreSection

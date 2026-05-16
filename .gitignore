@@ -30,6 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .codex-next-dev*.log
+/.codex-local/
+/AGENTS.md
+/PROJECT_CONTEXT.md
 
 # env files (can opt-in for committing if needed)
 .env*

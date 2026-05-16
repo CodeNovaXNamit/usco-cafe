@@ -1,5 +1,7 @@
 import { HomeOfferingStrip } from "@/components/home-offering-strip";
 import { HomeReviewSection } from "@/components/home-review-section";
+import { FrameSequenceHero } from "@/components/frame-sequence-hero";
+import { DesktopStoryCards } from "./desktop-story-cards";
 import {
   HomeExploreSection,
   HomeIntroSection,
@@ -7,22 +9,18 @@ import {
 } from "@/components/home/shared/home-sections";
 import { googleReviewCta, homeOfferingStripItems } from "@/data/site";
 import { desktopTeaserCards, homeIntroContent } from "../shared/home-content";
-import { DesktopHero } from "./desktop-hero";
 
 export default function DesktopHome() {
   return (
     <div className="home-motion-surface">
-      <DesktopHero />
+      <FrameSequenceHero />
+      <HomeIntroSection title={homeIntroContent.title} body={homeIntroContent.body} className="home-philosophy-section--lead" />
+      <HomePillarsSection className="" />
       <HomeOfferingStrip items={homeOfferingStripItems} />
-      <HomeIntroSection
-        title={homeIntroContent.title}
-        body={homeIntroContent.body}
-        className="px-4 pb-14 pt-8 sm:px-6 sm:pb-24 sm:pt-12 lg:px-10"
-      />
-      <HomePillarsSection className="px-4 pb-14 sm:px-6 sm:pb-24 lg:px-10" />
+      <DesktopStoryCards />
       <HomeExploreSection
         cards={desktopTeaserCards}
-        className="px-4 py-6 sm:px-6 sm:py-10 lg:px-10"
+        className=""
       />
       <HomeReviewSection
         reviewUrl={googleReviewCta.href}

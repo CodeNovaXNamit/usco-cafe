@@ -1,6 +1,6 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import {
   adminStats as fallbackAdminStats,
@@ -17,6 +17,8 @@ type MenuPrice = MenuItem["price"];
 
 const MENU_CSV_PATH = path.join(process.cwd(), "menu", "menu_data.csv");
 const MENU_IMAGE_DIR = path.join(process.cwd(), "public", "menu-items");
+const MENU_ADDON_DIR = path.join(MENU_IMAGE_DIR, "addon");
+const SUPPORTED_MENU_IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
 const MENU_IMAGE_ALIASES: Record<string, string> = {
   "anandini-tea": "anandini-tea",
@@ -121,14 +123,18 @@ function slugifyMenuName(name: string) {
 async function getMenuImagePath(name: string) {
   const slug = slugifyMenuName(name);
   const imageSlug = MENU_IMAGE_ALIASES[slug] ?? slug;
-  const imagePath = path.join(MENU_IMAGE_DIR, `${imageSlug}.png`);
 
-  try {
-    await readFile(imagePath);
-    return `/menu-items/${imageSlug}.png`;
-  } catch {
-    return undefined;
+  for (const extension of SUPPORTED_MENU_IMAGE_EXTENSIONS) {
+    const imagePath = path.join(MENU_IMAGE_DIR, `${imageSlug}${extension}`);
+    try {
+      await readFile(imagePath);
+      return `/menu-items/${imageSlug}${extension}`;
+    } catch {
+      // Check next extension.
+    }
   }
+
+  return undefined;
 }
 
 function buildMenuItemDescription(category: string, name: string) {
@@ -157,6 +163,102 @@ function buildMenuItemDescription(category: string, name: string) {
   }
 
   return "";
+}
+
+function toTitleCase(raw: string) {
+  return raw
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function mapAddonFolderCategory(folderName: string): MenuItem["category"] {
+  switch (folderName.toLowerCase()) {
+    case "hot":
+      return "coffee";
+    case "cold":
+      return "cold-drinks";
+    case "food":
+      return "food-snacks";
+    case "gelato":
+      return "gelato";
+    default:
+      return "seasonal";
+  }
+}
+
+async function readAddonMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
+  try {
+    const categoryDirs = await readdir(MENU_ADDON_DIR, { withFileTypes: true });
+    const existingIds = new Set(existing.map((item) => item.id));
+    const additions: MenuItem[] = [];
+
+    for (const dirEntry of categoryDirs) {
+      if (!dirEntry.isDirectory()) {
+        continue;
+      }
+
+      const category = mapAddonFolderCategory(dirEntry.name);
+      const categoryPath = path.join(MENU_ADDON_DIR, dirEntry.name);
+      const files = await readdir(categoryPath, { withFileTypes: true });
+      const currentCategoryMaxOrder = Math.max(
+        0,
+        ...existing.filter((item) => item.category === category).map((item) => item.sortOrder),
+        ...additions.filter((item) => item.category === category).map((item) => item.sortOrder),
+      );
+      let nextSortOrder = currentCategoryMaxOrder + 1;
+
+      for (const fileEntry of files) {
+        if (!fileEntry.isFile()) {
+          continue;
+        }
+
+        const extension = path.extname(fileEntry.name).toLowerCase();
+        if (!SUPPORTED_MENU_IMAGE_EXTENSIONS.has(extension)) {
+          continue;
+        }
+
+        const rawBaseName = path.parse(fileEntry.name).name.replace(/\s*-\s*copy$/i, "").trim();
+        const displayName = toTitleCase(rawBaseName.replace(/\s+/g, " "));
+        const slug = slugifyMenuName(rawBaseName);
+        const id = `${category}-${slug}`;
+
+        if (!slug || existingIds.has(id)) {
+          continue;
+        }
+
+        const description = buildMenuItemDescription(
+          category === "coffee"
+            ? "hot"
+            : category === "cold-drinks"
+              ? "cold"
+              : category === "food-snacks"
+                ? "nibbles"
+                : category,
+          displayName,
+        );
+
+        additions.push({
+          id,
+          name: displayName,
+          description,
+          price: 0,
+          category,
+          image: `/menu-items/addon/${dirEntry.name}/${fileEntry.name}`,
+          tags: [],
+          visible: true,
+          sortOrder: nextSortOrder,
+        });
+        existingIds.add(id);
+        nextSortOrder += 1;
+      }
+    }
+
+    return additions;
+  } catch {
+    return [];
+  }
 }
 
 async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {
@@ -217,13 +319,15 @@ export async function getMenuItems(): Promise<MenuItem[]> {
   const csvItems = await readMenuItemsFromCsv();
 
   if (csvItems && csvItems.length > 0) {
-    return csvItems;
+    const addonItems = await readAddonMenuItems(csvItems);
+    return [...csvItems, ...addonItems].filter((item) => item.category !== "gelato" || Boolean(item.image));
   }
 
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return fallbackMenuItems;
+    const addonItems = await readAddonMenuItems(fallbackMenuItems);
+    return [...fallbackMenuItems, ...addonItems].filter((item) => item.category !== "gelato" || Boolean(item.image));
   }
 
   const { data, error } = await supabase
@@ -234,10 +338,11 @@ export async function getMenuItems(): Promise<MenuItem[]> {
     .order("sort_order", { ascending: true });
 
   if (error || !data) {
-    return fallbackMenuItems;
+    const addonItems = await readAddonMenuItems(fallbackMenuItems);
+    return [...fallbackMenuItems, ...addonItems].filter((item) => item.category !== "gelato" || Boolean(item.image));
   }
 
-  return data.map((item) => ({
+  const dbItems = data.map((item) => ({
     id: item.id,
     name: item.name,
     description: item.description ?? "",
@@ -248,6 +353,8 @@ export async function getMenuItems(): Promise<MenuItem[]> {
     visible: item.visible ?? true,
     sortOrder: item.sort_order ?? 0,
   }));
+  const addonItems = await readAddonMenuItems(dbItems);
+  return [...dbItems, ...addonItems].filter((item) => item.category !== "gelato" || Boolean(item.image));
 }
 
 export async function getGalleryItems(): Promise<GalleryItem[]> {

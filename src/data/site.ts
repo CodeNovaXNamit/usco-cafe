@@ -1,7 +1,7 @@
 export const frameBaseUrl = "/api/frames";
-export const frameVersion = "animation-20260503";
+export const frameVersion = "animation-reexport-192";
 
-export const totalFrames = 115;
+export const totalFrames = 192;
 
 export function getFrameAssetUrl(index: number) {
   return `${frameBaseUrl}/${index}?v=${frameVersion}`;

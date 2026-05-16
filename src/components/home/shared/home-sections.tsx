@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { IconMark } from "@/components/icon-mark";
-import { SectionIntro } from "@/components/section-intro";
 import { pillars } from "@/data/site";
 import type { HomeTeaserCard } from "./home-content";
 import { MotionInView } from "./motion-in-view";
@@ -15,8 +14,14 @@ type IntroSectionProps = {
 
 export function HomeIntroSection({ title, body, className = "" }: IntroSectionProps) {
   return (
-    <section className={className}>
-      <SectionIntro animated title={title} body={body} />
+    <section className={`home-philosophy-section ${className}`}>
+      <div className="home-philosophy-shell">
+        <div className="home-philosophy-copy">
+          <p className="home-section-kicker">A Slower Kind of Place</p>
+          <h2>{title}</h2>
+          <p>{body}</p>
+        </div>
+      </div>
     </section>
   );
 }
@@ -30,30 +35,33 @@ type PillarsSectionProps = {
 export function HomePillarsSection({
   className = "",
   cardClassName = "",
-  gridClassName = "mx-auto grid max-w-7xl gap-4 sm:gap-5 lg:grid-cols-3",
+  gridClassName = "home-philosophy-cards",
 }: PillarsSectionProps) {
   return (
-    <section className={className}>
-      <div className={gridClassName}>
+    <section className={`home-philosophy-section home-philosophy-section--cards ${className}`}>
+      <div className="home-philosophy-shell">
+        <div className={gridClassName}>
         {pillars.map((pillar, index) => (
           <MotionInView
             key={pillar.title}
             direction={index % 3 === 1 ? "bottom" : index % 3 === 2 ? "right" : "left"}
             delay={`${0.04 + index * 0.08}s`}
-            className="rounded-[28px]"
+            className="home-philosophy-card"
           >
             <article
-              className={`pillar-glass-card grain rounded-[28px] border border-matcha-light/55 bg-[linear-gradient(180deg,rgba(143,169,107,0.24),rgba(212,223,192,0.14))] p-6 shadow-[0_20px_54px_rgba(74,94,56,0.12)] backdrop-blur-xl sm:p-8 ${cardClassName}`}
+              className={`home-philosophy-card__inner ${cardClassName}`}
             >
-              <IconMark kind={pillar.icon as "cup" | "leaf" | "clock"} />
+              <div className="home-philosophy-icon">
+                <IconMark kind={pillar.icon as "cup" | "leaf" | "clock"} />
+              </div>
               <h3
-                className="home-motion-text home-motion-text--drift mt-6 font-display text-3xl text-matcha-deep sm:mt-8 sm:text-4xl"
+                className="home-motion-text home-motion-text--drift home-philosophy-title"
                 style={{ "--motion-delay": `${0.12 + index * 0.1}s` } as CSSProperties}
               >
                 {pillar.title}
               </h3>
               <p
-                className="home-motion-text mt-3 text-base leading-7 text-charcoal/75 sm:text-lg sm:leading-8"
+                className="home-motion-text home-philosophy-text"
                 style={{ "--motion-delay": `${0.2 + index * 0.1}s` } as CSSProperties}
               >
                 {pillar.line}
@@ -61,6 +69,7 @@ export function HomePillarsSection({
             </article>
           </MotionInView>
         ))}
+        </div>
       </div>
     </section>
   );
@@ -77,19 +86,16 @@ type ExploreSectionProps = {
 export function HomeExploreSection({
   cards,
   className = "",
-  cardsClassName = "grid gap-4 sm:gap-5 lg:grid-cols-3",
-  headingClassName = "home-motion-text home-motion-text--drift mt-3 font-display text-[2.8rem] leading-[0.96] text-matcha-deep sm:text-6xl",
+  cardsClassName = "home-explore-grid",
+  headingClassName = "home-motion-text home-motion-text--drift",
   showDesktopCta = true,
 }: ExploreSectionProps) {
   return (
-    <section className={className}>
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+    <section className={`home-explore-premium ${className}`}>
+      <div className="home-explore-shell">
+        <div className="home-explore-heading">
           <div>
-            <p
-              className="home-motion-text home-motion-text--drift font-sans text-[11px] uppercase tracking-[0.28em] text-matcha-mid sm:text-xs sm:tracking-[0.32em]"
-              style={{ "--motion-delay": "0.08s" } as CSSProperties}
-            >
+            <p className="home-section-kicker home-motion-text home-motion-text--drift" style={{ "--motion-delay": "0.08s" } as CSSProperties}>
               Explore next
             </p>
             <h2 className={headingClassName} style={{ "--motion-delay": "0.16s" } as CSSProperties}>
@@ -102,45 +108,46 @@ export function HomeExploreSection({
               className="home-motion-text hidden font-sans text-xs uppercase tracking-[0.26em] text-matcha-mid sm:block"
               style={{ "--motion-delay": "0.24s" } as CSSProperties}
             >
-              Find the lane
+              Start where it feels right
             </Link>
           ) : null}
         </div>
+
         <div className={cardsClassName}>
           {cards.map((card, index) => (
             <Link
               key={card.href}
               href={card.href}
-              className="group overflow-hidden rounded-[28px] border border-white/60 bg-white/80 shadow-[0_18px_50px_rgba(74,94,56,0.08)]"
+              className="group home-explore-card"
             >
-              <div className="relative aspect-[4/5] overflow-hidden">
+              <div className="home-explore-media">
                 <Image
                   src={card.image}
                   alt={card.title}
                   fill
-                  sizes="(max-width: 767px) 100vw, 33vw"
-                  className="object-cover transition duration-700 group-hover:scale-[1.03] group-hover:saturate-110"
+                  sizes="(max-width: 1023px) 100vw, 33vw"
+                  className="home-explore-image"
                 />
               </div>
-              <div className="p-5 sm:p-6">
+              <div className="home-explore-content">
                 <h3
-                  className="home-motion-text home-motion-text--drift font-display text-3xl text-matcha-deep sm:text-4xl"
+                  className="home-motion-text home-motion-text--drift"
                   style={{ "--motion-delay": `${0.12 + index * 0.1}s` } as CSSProperties}
                 >
                   {card.title}
                 </h3>
                 <p
-                  className="home-motion-text mt-3 text-base leading-7 text-charcoal/75 sm:text-lg sm:leading-8"
+                  className="home-motion-text"
                   style={{ "--motion-delay": `${0.2 + index * 0.1}s` } as CSSProperties}
                 >
                   {card.blurb}
                 </p>
-                <p
-                  className="home-motion-text mt-5 font-sans text-[11px] uppercase tracking-[0.24em] text-matcha-mid sm:mt-6 sm:text-xs"
+                <span
+                  className="home-motion-text home-explore-cta"
                   style={{ "--motion-delay": `${0.28 + index * 0.1}s` } as CSSProperties}
                 >
                   Explore onward
-                </p>
+                </span>
               </div>
             </Link>
           ))}
