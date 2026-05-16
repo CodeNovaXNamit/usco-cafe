@@ -53,8 +53,26 @@ export default function FindUsPage() {
                   <p className="font-sans text-[11px] uppercase tracking-[0.24em] text-matcha-mid sm:text-xs sm:tracking-[0.28em]">
                     Social
                   </p>
-                  <Link href="https://instagram.com/usco.cafe" className="mt-3 inline-block text-base text-charcoal/80 hover:text-matcha-deep sm:text-lg">
-                    Instagram: {findUs.instagram}
+                  <Link
+                    href="https://www.instagram.com/uscocafe/"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="USCO Cafe on Instagram"
+                    className="mt-3 inline-flex items-center gap-2 text-base text-charcoal/80 transition hover:text-matcha-deep sm:text-lg"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4 fill-none stroke-current"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+                      <path d="M16.5 7.5h.01" />
+                      <circle cx="12" cy="12" r="4" />
+                    </svg>
+                    {findUs.instagram}
                   </Link>
                 </div>
                 <div>

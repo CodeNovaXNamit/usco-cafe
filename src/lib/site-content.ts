@@ -36,6 +36,8 @@ function mapMenuCategory(category: string): MenuItem["category"] {
       return "cold-drinks";
     case "food":
       return "food-snacks";
+    case "gelato":
+      return "gelato";
     case "seasonal":
       return "seasonal";
     default:
@@ -52,6 +54,8 @@ function mapCsvMenuCategory(category: string): MenuItem["category"] {
       return "cold-drinks";
     case "nibbles":
       return "food-snacks";
+    case "gelato":
+      return "gelato";
     default:
       return "coffee";
   }
@@ -146,6 +150,10 @@ function buildMenuItemDescription(category: string, name: string) {
 
   if (group === "nibbles") {
     return "Small plates and cafe bites.";
+  }
+
+  if (group === "gelato") {
+    return "Slow churned gelato, served cold.";
   }
 
   return "";

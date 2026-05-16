@@ -12,6 +12,8 @@ function categoryLabel(category: Exclude<MenuCategory, "all">) {
       return "Cold Ritual";
     case "food-snacks":
       return "From the Counter";
+    case "gelato":
+      return "Cold Spoon";
     case "seasonal":
       return "Seasonal Note";
     default:

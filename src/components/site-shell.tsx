@@ -44,7 +44,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
             })}
           </nav>
           <div className="hidden shrink-0 rounded-full border border-matcha-light/60 bg-white/46 px-4 py-2 font-sans text-[11px] uppercase tracking-[0.18em] text-matcha-mid shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] xl:block">
-            Open Today / 8am-8pm
+            Open Today / 10am-8pm
           </div>
         </div>
       </header>
@@ -65,8 +65,28 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
             ))}
           </div>
           <div className="space-y-3 text-sm text-matcha-light">
-            <p className="font-sans text-xs uppercase tracking-[0.18em] sm:text-sm sm:tracking-[0.2em]">@usco.cafe</p>
-            <p className="font-sans text-xs uppercase tracking-[0.18em] sm:text-sm sm:tracking-[0.2em]">Open 8am - 8pm</p>
+            <a
+              href="https://www.instagram.com/uscocafe/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="USCO Cafe on Instagram"
+              className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.18em] text-matcha-light transition hover:text-white sm:text-sm sm:tracking-[0.2em]"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-4 w-4 fill-none stroke-current"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+                <path d="M16.5 7.5h.01" />
+                <circle cx="12" cy="12" r="4" />
+              </svg>
+              @uscocafe
+            </a>
+            <p className="font-sans text-xs uppercase tracking-[0.18em] sm:text-sm sm:tracking-[0.2em]">Open 10am - 8pm</p>
             <p>No WiFi password. No rush. No. 4.</p>
           </div>
         </div>

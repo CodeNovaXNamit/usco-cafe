@@ -19,6 +19,7 @@ export type MenuCategory =
   | "coffee"
   | "cold-drinks"
   | "food-snacks"
+  | "gelato"
   | "seasonal";
 
 export type DietaryTag =
@@ -46,6 +47,7 @@ export const menuTabs: { key: MenuCategory; label: string }[] = [
   { key: "coffee", label: "Coffee" },
   { key: "cold-drinks", label: "Cold Drinks" },
   { key: "food-snacks", label: "Food & Snacks" },
+  { key: "gelato", label: "Gelato" },
   { key: "seasonal", label: "Seasonal" },
 ];
 
@@ -291,6 +293,26 @@ export const menuItems: MenuItem[] = [
     sortOrder: 8,
   },
   {
+    id: "gelato-vanilla-bean",
+    name: "Vanilla Bean Gelato",
+    description: "Single scoop, smooth and slow-melted",
+    price: 180,
+    category: "gelato",
+    tags: ["Vegetarian"],
+    visible: true,
+    sortOrder: 1,
+  },
+  {
+    id: "gelato-dark-chocolate",
+    name: "Dark Chocolate Gelato",
+    description: "Single scoop, deep cocoa finish",
+    price: 190,
+    category: "gelato",
+    tags: ["Vegetarian"],
+    visible: true,
+    sortOrder: 2,
+  },
+  {
     id: "seasonal-1",
     name: "Seasonal Item 1",
     description: "Added by admin each month",
@@ -517,7 +539,7 @@ export const findUs = {
     "Upstairs stays quieter for long reads",
     "Best to verify on Instagram before heading over",
   ],
-  instagram: "@usco.cafe",
+  instagram: "@uscocafe",
   mapUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.3424860495943!2d77.2164567!3d28.547473399999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce34ee3b5c2d5%3A0xc861a88ed99ee032!2sUSCO%20CAFE!5e1!3m2!1sen!2sin!4v1777708200413!5m2!1sen!2sin",
 };
