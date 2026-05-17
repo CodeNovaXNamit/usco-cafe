@@ -108,6 +108,8 @@ export default function FindUsPage() {
                   </svg>
                   Open Instagram
                 </Link>
+                <p className="mt-3 text-sm text-[#3a3e34]/80">WhatsApp: 7628 827 848</p>
+                <p className="mt-1 text-sm text-[#3a3e34]/80">Email: uscocafe@gmail.com</p>
               </div>
             </div>
 
