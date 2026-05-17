@@ -81,15 +81,19 @@ const localBusinessSchema = {
 
 export default function HomePage() {
   return (
-    <HomeLoadingGate>
-      <SiteShell currentPath="/">
-        <h1 className="sr-only">USCO Cafe in Shahpur Jat, New Delhi</h1>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
+    <SiteShell currentPath="/">
+      <h1 className="sr-only">USCO Cafe in Shahpur Jat, New Delhi</h1>
+      <p className="sr-only">
+        Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a
+        cozy work-friendly space. Explore our menu, gallery, location, and opening hours.
+      </p>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+      <HomeLoadingGate>
         <ResponsiveHome />
-      </SiteShell>
-    </HomeLoadingGate>
+      </HomeLoadingGate>
+    </SiteShell>
   );
 }

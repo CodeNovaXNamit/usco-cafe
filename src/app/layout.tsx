@@ -45,13 +45,13 @@ export const metadata: Metadata = {
   description:
     "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
   alternates: {
-    canonical: "/",
+    canonical: "https://www.uscocollective.com/",
   },
   openGraph: {
     title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
     description:
       "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
-    url: "https://www.uscocollective.com",
+    url: "https://www.uscocollective.com/",
     siteName: "USCO Cafe",
     locale: "en_US",
     type: "website",
