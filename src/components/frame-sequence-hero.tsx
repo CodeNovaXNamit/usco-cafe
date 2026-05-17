@@ -293,7 +293,7 @@ export function FrameSequenceHero() {
 
         <div ref={startOverlayRef} className="frame-sequence-start-overlay">
           <article className="frame-glass-card frame-glass-card--left">
-            <p className="frame-glass-kicker">COFFEE + QUIET</p>
+            <p className="frame-glass-kicker">COFFEE + TOAST + WORK</p>
             <h2>Somewhere softer than the usual rush.</h2>
             <p>A calm little stop in Shahpur Jat for slow sips, warm lights, and quiet conversations.</p>
           </article>

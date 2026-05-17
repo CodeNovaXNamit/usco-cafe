@@ -18,7 +18,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
           <Link href="/" className="site-brand">
             <span className="site-brand-logo">USCO</span>
             <span className="site-brand-copy">
-              <span>Coffee + Quiet</span>
+              <span>COFFEE+TOAST+WORK</span>
               <em>A slower cup in Shahpur Jat</em>
             </span>
           </Link>
@@ -52,7 +52,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
           <div>
             <div className="font-display text-[2.2rem] tracking-[0.08em] sm:text-4xl">USCO</div>
             <div className="font-accent text-[11px] uppercase tracking-[0.3em] text-matcha-light sm:text-sm sm:tracking-[0.35em]">
-              Coffee + Quiet
+              COFFEE+TOAST+WORK
             </div>
           </div>
           <div className="flex flex-col gap-2 font-sans text-xs uppercase tracking-[0.16em] text-matcha-light sm:text-sm sm:tracking-[0.18em]">
