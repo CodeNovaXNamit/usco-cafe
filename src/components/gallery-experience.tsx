@@ -142,13 +142,20 @@ export function GalleryExperience() {
                       muted
                       loop
                       playsInline
-                      preload="metadata"
+                      preload={index === 0 ? "metadata" : "none"}
                       aria-label={item.alt}
                     />
                   ) : null}
 
                   {mediaType === "image" ? (
-                    <Image src={item.preview} alt={item.alt} fill sizes="(max-width: 1023px) 100vw, 33vw" />
+                    <Image
+                      src={item.preview}
+                      alt={item.alt}
+                      fill
+                      sizes="(max-width: 1023px) 100vw, 33vw"
+                      loading={index === 0 ? "eager" : "lazy"}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                    />
                   ) : null}
 
                   <span className="gallery-premium-badge">{item.eyebrow}</span>

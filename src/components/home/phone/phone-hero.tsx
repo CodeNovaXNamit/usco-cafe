@@ -65,7 +65,7 @@ export function PhoneHero() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           data-loader-critical
           className="absolute inset-0 h-full w-full object-cover object-center"
         >

@@ -1,27 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import DesktopHome from "@/components/home/desktop/DesktopHome";
-import PhoneHome from "@/components/home/phone/PhoneHome";
+import { useEffect, useState, type ComponentType } from "react";
 
 export function ResponsiveHome() {
-  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [HomeComponent, setHomeComponent] = useState<ComponentType | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     const media = window.matchMedia("(min-width: 768px)");
-    const update = () => setIsDesktop(media.matches);
+    const update = async () => {
+      if (media.matches) {
+        const desktopModule = await import("@/components/home/desktop/DesktopHome");
+        if (!cancelled) {
+          setHomeComponent(() => desktopModule.default);
+        }
+        return;
+      }
 
-    update();
-    media.addEventListener("change", update);
+      const phoneModule = await import("@/components/home/phone/PhoneHome");
+      if (!cancelled) {
+        setHomeComponent(() => phoneModule.default);
+      }
+    };
+
+    const handleChange = () => {
+      void update();
+    };
+
+    void update();
+    media.addEventListener("change", handleChange);
 
     return () => {
-      media.removeEventListener("change", update);
+      cancelled = true;
+      media.removeEventListener("change", handleChange);
     };
   }, []);
 
-  if (isDesktop === null) {
+  if (!HomeComponent) {
     return null;
   }
 
-  return isDesktop ? <DesktopHome /> : <PhoneHome />;
+  return <HomeComponent />;
 }

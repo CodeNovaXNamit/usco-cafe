@@ -56,7 +56,7 @@ function MenuCard({ item }: { item: MenuItem }) {
           {item.image ? (
             <Image
               src={item.image}
-              alt={item.name}
+              alt={`${item.name} at USCO Cafe in Shahpur Jat`}
               width={720}
               height={720}
               className="premium-menu-image"

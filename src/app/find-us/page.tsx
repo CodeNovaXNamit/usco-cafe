@@ -1,20 +1,65 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SectionIntro } from "@/components/section-intro";
 import { SiteShell } from "@/components/site-shell";
 import { findUs } from "@/data/site";
 
+export const metadata: Metadata = {
+  title: "Find USCO Cafe | Location, Hours & Directions",
+  description:
+    "Find USCO Cafe at Shop Number 4, Shahpur Jat, Siri Fort, New Delhi. Check opening hours, Google Maps directions, Instagram, WhatsApp, and email.",
+  alternates: {
+    canonical: "https://www.uscocollective.com/find-us",
+  },
+  openGraph: {
+    title: "Find USCO Cafe | Location, Hours & Directions",
+    description:
+      "Find USCO Cafe at Shop Number 4, Shahpur Jat, Siri Fort, New Delhi. Check opening hours, Google Maps directions, Instagram, WhatsApp, and email.",
+    url: "https://www.uscocollective.com/find-us",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Find USCO Cafe | Location, Hours & Directions",
+    description:
+      "Find USCO Cafe at Shop Number 4, Shahpur Jat, Siri Fort, New Delhi. Check opening hours, Google Maps directions, Instagram, WhatsApp, and email.",
+  },
+};
+
 export default function FindUsPage() {
   const googleMapsUrl =
     "https://www.google.com/maps/search/?api=1&query=USCO%20Cafe%20Shop%20Number%204%20Shahpur%20Jat%20New%20Delhi";
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.uscocollective.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Find Us",
+        item: "https://www.uscocollective.com/find-us",
+      },
+    ],
+  };
 
   return (
     <SiteShell currentPath="/find-us">
       <section className="inner-page-surface find-page-surface">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
         <div className="find-hero-wrap">
           <SectionIntro
             eyebrow="Find Us"
-            title="You don&apos;t need directions. You need an excuse to come."
-            body="We&apos;re at No. 4. The door is usually open."
+            title="Find USCO Cafe in Shahpur Jat"
+            body="USCO Cafe is at Shop Number 4, Shahpur Jat, Siri Fort, New Delhi. Check opening hours and directions before you head over."
+            headingLevel={1}
           />
         </div>
 
@@ -131,6 +176,17 @@ export default function FindUsPage() {
                 Instagram
               </Link>
             </div>
+            <p className="mt-4 text-sm text-charcoal/75">
+              Explore our{" "}
+              <Link href="/menu" className="underline decoration-matcha-mid/60 underline-offset-4 hover:text-matcha-deep">
+                menu
+              </Link>{" "}
+              or browse the{" "}
+              <Link href="/gallery" className="underline decoration-matcha-mid/60 underline-offset-4 hover:text-matcha-deep">
+                gallery
+              </Link>{" "}
+              before visiting.
+            </p>
           </aside>
         </div>
 

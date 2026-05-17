@@ -6,6 +6,7 @@ type SectionIntroProps = {
   body: string;
   align?: "left" | "center";
   animated?: boolean;
+  headingLevel?: 1 | 2;
 };
 
 export function SectionIntro({
@@ -14,7 +15,9 @@ export function SectionIntro({
   body,
   align = "center",
   animated = false,
+  headingLevel = 2,
 }: SectionIntroProps) {
+  const HeadingTag = headingLevel === 1 ? "h1" : "h2";
   const alignment =
     align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl text-left";
 
@@ -30,14 +33,14 @@ export function SectionIntro({
           {eyebrow}
         </p>
       ) : null}
-      <h2
+      <HeadingTag
         className={`text-balance font-display text-[2.7rem] leading-[0.94] text-matcha-deep sm:text-6xl lg:text-7xl ${
           animated ? "home-motion-text home-motion-text--drift" : ""
         }`}
         style={animated ? ({ "--motion-delay": "0.16s" } as CSSProperties) : undefined}
       >
         {title}
-      </h2>
+      </HeadingTag>
       <p
         className={`mt-5 text-base leading-7 text-charcoal/80 sm:mt-6 sm:text-xl sm:leading-8 ${
           animated ? "home-motion-text" : ""

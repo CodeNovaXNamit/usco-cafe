@@ -7,7 +7,7 @@ export type HomeTeaserCard = {
 
 export const homeIntroContent = {
   title: "Somewhere between your first sip and your last thought.",
-  body: "USCO is a small place that asks very little of you. Sit. Breathe. Let the coffee do the rest.",
+  body: "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space.",
 };
 
 export const desktopTeaserCards: HomeTeaserCard[] = [

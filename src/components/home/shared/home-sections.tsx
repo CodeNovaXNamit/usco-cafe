@@ -123,7 +123,7 @@ export function HomeExploreSection({
               <div className="home-explore-media">
                 <Image
                   src={card.image}
-                  alt={card.title}
+                  alt={`${card.title} at USCO Cafe in Shahpur Jat, New Delhi`}
                   fill
                   sizes="(max-width: 1023px) 100vw, 33vw"
                   className="home-explore-image"

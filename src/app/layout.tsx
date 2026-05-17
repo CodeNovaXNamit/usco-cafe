@@ -37,21 +37,39 @@ const accentFont = Cormorant_SC({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://uscocafe.com"),
-  title: "USCO - Coffee + Quiet",
+  metadataBase: new URL("https://www.uscocollective.com"),
+  title: {
+    default: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    template: "%s | USCO Cafe",
+  },
   description:
-    "A small cafe that asks very little of you. Come in, sit down, let the coffee do the rest. At No. 4.",
+    "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "USCO - Coffee + Quiet",
+    title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
     description:
-      "A small cafe that asks very little of you. Come in, sit down, let the coffee do the rest. At No. 4.",
-    url: "https://uscocafe.com",
-    siteName: "USCO",
+      "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
+    url: "https://www.uscocollective.com",
+    siteName: "USCO Cafe",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "https://www.uscocollective.com/home/Logo/logo-rounded.png",
+        width: 1200,
+        height: 630,
+        alt: "USCO Cafe in Shahpur Jat, New Delhi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    description:
+      "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
+    images: ["https://www.uscocollective.com/home/Logo/logo-rounded.png"],
   },
 };
 
