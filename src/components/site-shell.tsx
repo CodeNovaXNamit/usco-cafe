@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import { navLinks } from "@/data/site";
+import { HeaderHeightSync } from "@/components/header-height-sync";
 
 type SiteShellProps = {
   children: ReactNode;
@@ -13,6 +14,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
 
   return (
     <div className={`site-shell min-h-screen text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
+      <HeaderHeightSync />
       <header className={`site-header ${isHomePage ? "site-header--home" : "border-b border-matcha-light/70"}`}>
         <div className="site-header-shell">
           <Link href="/" className="site-brand">

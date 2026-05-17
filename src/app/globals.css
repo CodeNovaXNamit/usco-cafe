@@ -2,6 +2,7 @@
 
 :root {
   --header-offset: 6.75rem;
+  --phone-hero-logo-gap: 0.7rem;
   --white: #f8f6f1;
   --matcha-light: #d4dfc0;
   --matcha-mid: #8fa96b;
@@ -2558,6 +2559,11 @@ button {
   padding: 1.1rem 1rem 2.2rem;
 }
 
+.phone-hero-brand {
+  left: 1rem;
+  top: calc(var(--header-offset) + var(--phone-hero-logo-gap));
+}
+
 .phone-story-card {
   position: relative;
   isolation: isolate;
@@ -2716,6 +2722,10 @@ button {
 }
 
 @media (max-width: 390px) {
+  :root {
+    --phone-hero-logo-gap: 0.6rem;
+  }
+
   .phone-story-media {
     min-height: 470px;
     border-radius: 28px;
@@ -3066,6 +3076,10 @@ button {
 
 @media (max-width: 380px) {
   :root {
+    --phone-hero-logo-gap: 0.5rem;
+  }
+
+  :root {
     --header-offset: 7.6rem;
   }
 
@@ -3122,6 +3136,10 @@ button {
 }
 
 @media (max-width: 359px) {
+  :root {
+    --phone-hero-logo-gap: 0.45rem;
+  }
+
   :root {
     --header-offset: 4.25rem;
   }
