@@ -38,6 +38,9 @@ function mapMenuCategory(category: string): MenuItem["category"] {
       return "cold-drinks";
     case "food":
       return "food-snacks";
+    case "usco_specials":
+    case "specials":
+      return "usco-specials";
     case "gelato":
       return "gelato";
     case "seasonal":
@@ -54,6 +57,10 @@ function mapCsvMenuCategory(category: string): MenuItem["category"] {
     case "cold":
     case "beverages":
       return "cold-drinks";
+    case "premium":
+    case "specials":
+    case "usco specials":
+      return "usco-specials";
     case "nibbles":
       return "food-snacks";
     case "gelato":
@@ -162,6 +169,10 @@ function buildMenuItemDescription(category: string, name: string) {
     return "Slow churned gelato, served cold.";
   }
 
+  if (group === "premium" || group === "specials" || group === "usco specials") {
+    return "House specials for the slower side of the day.";
+  }
+
   return "";
 }
 
@@ -181,6 +192,10 @@ function mapAddonFolderCategory(folderName: string): MenuItem["category"] {
       return "cold-drinks";
     case "food":
       return "food-snacks";
+    case "premium":
+    case "specials":
+    case "usco-specials":
+      return "usco-specials";
     case "gelato":
       return "gelato";
     default:

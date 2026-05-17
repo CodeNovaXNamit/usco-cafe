@@ -24,6 +24,12 @@ function getCategoryMeta(category: Exclude<MenuCategory, "all">) {
         note: "A soft little pairing for your cup.",
         accent: "snack",
       };
+    case "usco-specials":
+      return {
+        label: "USCO Special",
+        note: "House picks that define the USCO ritual.",
+        accent: "seasonal",
+      };
     case "gelato":
       return {
         label: "Sweet Pause",

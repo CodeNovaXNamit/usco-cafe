@@ -19,6 +19,7 @@ export type MenuCategory =
   | "coffee"
   | "cold-drinks"
   | "food-snacks"
+  | "usco-specials"
   | "gelato"
   | "seasonal";
 
@@ -44,9 +45,10 @@ export type MenuItem = {
 
 export const menuTabs: { key: MenuCategory; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "coffee", label: "Coffee" },
+  { key: "coffee", label: "Hot Drinks" },
   { key: "cold-drinks", label: "Cold Drinks" },
-  { key: "food-snacks", label: "Food & Snacks" },
+  { key: "food-snacks", label: "Nibbles" },
+  { key: "usco-specials", label: "USCO Specials" },
   { key: "gelato", label: "Gelato" },
   { key: "seasonal", label: "Seasonal" },
 ];
@@ -117,7 +119,7 @@ export const menuItems: MenuItem[] = [
     name: "USCO Signature Latte",
     description: "House blend, brown butter, cardamom",
     price: 220,
-    category: "coffee",
+    category: "usco-specials",
     tags: ["Signature"],
     visible: true,
     sortOrder: 7,
