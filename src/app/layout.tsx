@@ -39,7 +39,7 @@ const accentFont = Cormorant_SC({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.uscocollective.com"),
   title: {
-    default: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    default: "USCO - Coffee + Toast + Work | USCO Cafe in Shahpur Jat, New Delhi",
     template: "%s | USCO Cafe",
   },
   description:
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     canonical: "https://www.uscocollective.com/",
   },
   openGraph: {
-    title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    title: "USCO - Coffee + Toast + Work | USCO Cafe in Shahpur Jat, New Delhi",
     description:
       "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
     url: "https://www.uscocollective.com/",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    title: "USCO - Coffee + Toast + Work | USCO Cafe in Shahpur Jat, New Delhi",
     description:
       "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
     images: ["https://www.uscocollective.com/home/Logo/logo-rounded.png"],

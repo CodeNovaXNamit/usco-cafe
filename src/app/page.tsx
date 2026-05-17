@@ -4,14 +4,14 @@ import { ResponsiveHome } from "@/components/home/responsive-home";
 import { SiteShell } from "@/components/site-shell";
 
 export const metadata: Metadata = {
-  title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+  title: "USCO - Coffee + Toast + Work | USCO Cafe in Shahpur Jat, New Delhi",
   description:
     "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
   alternates: {
     canonical: "https://www.uscocollective.com/",
   },
   openGraph: {
-    title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    title: "USCO - Coffee + Toast + Work | USCO Cafe in Shahpur Jat, New Delhi",
     description:
       "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
     url: "https://www.uscocollective.com/",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "USCO - Coffee + Quiet | USCO Cafe in Shahpur Jat, New Delhi",
+    title: "USCO - Coffee + Toast + Work | USCO Cafe in Shahpur Jat, New Delhi",
     description:
       "Visit USCO Cafe in Shahpur Jat, New Delhi for coffee, toast, quiet cafe moments, warm natural light, and a cozy work-friendly space. View our menu, gallery, location, and opening hours.",
     images: ["https://www.uscocollective.com/home/Logo/logo-rounded.png"],
@@ -40,7 +40,7 @@ const localBusinessSchema = {
   "@type": "CafeOrCoffeeShop",
   "@id": "https://www.uscocollective.com/#localbusiness",
   name: "USCO Cafe",
-  alternateName: ["USCO CAFE", "USCO - Coffee + Quiet"],
+  alternateName: ["USCO CAFE", "USCO - Coffee + Toast + Work"],
   url: "https://www.uscocollective.com/",
   image: "https://www.uscocollective.com/home/Logo/logo-rounded.png",
   description:

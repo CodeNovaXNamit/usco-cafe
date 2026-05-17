@@ -15,7 +15,7 @@
 The USCO Cafe website is already indexed by Google and appears for the branded search query `usco cafe`, but the current organic search result is not strong enough yet. In the screenshot, Google is showing the official website result below Instagram, Zomato, goSTOPS, District by Zomato, Goto Where, and other directory-style pages. The official result currently appears as:
 
 ```text
-USCO - Coffee + Quiet
+USCO - Coffee + Toast + Work
 16 hours ago — USCOCoffee + QuietA slower cup in Shahpur Jat HomeMenuGalleryFind Us. Open Today / 10am-8pm. USCO cafe interior with warm natural light.
 ```
 
@@ -74,7 +74,7 @@ The main SEO weaknesses visible from the screenshot are:
    Current title:
 
    ```text
-   USCO - Coffee + Quiet
+   USCO - Coffee + Toast + Work
    ```
 
    This is beautiful for branding, but weak for local SEO. It should include “Cafe” and “Shahpur Jat” while preserving the brand tone.
@@ -86,7 +86,7 @@ The main SEO weaknesses visible from the screenshot are:
    Zomato, goSTOPS, Goto Where, and Shahpur Jat cafe guide pages have strong textual descriptions. The official website needs stronger, clearer, official information.
 
 6. **There may be a brand naming inconsistency.**  
-   Google Business Profile shows `USCO CAFE`, while the website title shows `USCO - Coffee + Quiet`. Both are fine creatively, but SEO needs a consistent official entity name.
+   Google Business Profile shows `USCO CAFE`, while the website title shows `USCO - Coffee + Toast + Work`. Both are fine creatively, but SEO needs a consistent official entity name.
 
 ---
 
