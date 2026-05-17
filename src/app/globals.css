@@ -2814,7 +2814,7 @@ button {
   }
 
   .site-header-shell {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
     gap: 0.7rem;
   }
 
@@ -2824,18 +2824,21 @@ button {
   }
 
   .site-nav {
-    width: auto;
+    width: min(100%, 430px);
     min-width: 0;
+    justify-self: end;
+    justify-content: space-between;
   }
 
   .header-glass-link {
-    padding: 0 0.75rem;
-    letter-spacing: 0.12em;
+    padding: 0 0.65rem;
+    letter-spacing: 0.1em;
     font-size: 0.63rem;
+    white-space: nowrap;
   }
 
   .header-glass-nav {
-    padding-right: 0.2rem;
+    padding-inline: 0.22rem;
     min-height: 38px;
   }
 
@@ -2917,6 +2920,106 @@ button {
   .gallery-premium-card--featured .gallery-premium-media,
   .gallery-premium-media {
     aspect-ratio: 4 / 5;
+  }
+}
+
+@media (max-width: 380px) {
+  :root {
+    --header-offset: 7.6rem;
+  }
+
+  .site-header {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .site-header-shell {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    justify-items: center;
+  }
+
+  .site-brand {
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .site-brand-logo {
+    font-size: 1.25rem;
+    letter-spacing: 0.18em;
+  }
+
+  .site-brand-copy,
+  .site-status-pill {
+    display: none;
+  }
+
+  .site-nav {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.15rem;
+    padding: 0.22rem;
+    border-radius: 999px;
+  }
+
+  .site-nav a {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 32px;
+    padding: 0 0.35rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    text-align: center;
+  }
+}
+
+@media (max-width: 359px) {
+  :root {
+    --header-offset: 4.25rem;
+  }
+
+  .site-header {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .site-header-shell {
+    width: 100%;
+    display: block;
+  }
+
+  .site-brand,
+  .site-brand-copy,
+  .site-status-pill {
+    display: none !important;
+  }
+
+  .site-nav {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.12rem;
+    padding: 0.22rem;
+    border-radius: 999px;
+  }
+
+  .site-nav a {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0 0.28rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    text-align: center;
   }
 }
 
