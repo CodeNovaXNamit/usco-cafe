@@ -17,11 +17,13 @@ export const navLinks = [
 export type MenuCategory =
   | "all"
   | "coffee"
+  | "matcha"
   | "cold-drinks"
   | "food-snacks"
   | "usco-specials"
   | "gelato"
-  | "seasonal";
+  | "seasonal"
+  | "shibuya-honey-toast";
 
 export type DietaryTag =
   | "Vegan"
@@ -46,11 +48,13 @@ export type MenuItem = {
 export const menuTabs: { key: MenuCategory; label: string }[] = [
   { key: "all", label: "All" },
   { key: "coffee", label: "Hot Drinks" },
+  { key: "matcha", label: "Matcha" },
   { key: "cold-drinks", label: "Cold Drinks" },
   { key: "food-snacks", label: "Nibbles" },
   { key: "usco-specials", label: "USCO Specials" },
   { key: "gelato", label: "Gelato" },
   { key: "seasonal", label: "Seasonal" },
+  { key: "shibuya-honey-toast", label: "Shibuya Honey Toast" },
 ];
 
 export const menuItems: MenuItem[] = [
@@ -304,17 +308,6 @@ export const menuItems: MenuItem[] = [
     tags: ["New"],
     visible: true,
     sortOrder: 9,
-  },
-  {
-    id: "shibuya-honey-toast",
-    name: "Shibuya Honey Toast",
-    description: "Freshly served, ask the bar for details",
-    price: 0,
-    category: "food-snacks",
-    image: "/menu-items/New-addon/Nibbles/Shibuya%20Honey%20Toast.png",
-    tags: ["New"],
-    visible: true,
-    sortOrder: 10,
   },
   {
     id: "usco-bun-maska",

@@ -12,6 +12,12 @@ function getCategoryMeta(category: Exclude<MenuCategory, "all">) {
         note: "Best for quiet mornings and focused sips.",
         accent: "coffee",
       };
+    case "matcha":
+      return {
+        label: "Matcha Ritual",
+        note: "Matcha creations for calm, creamy sips.",
+        accent: "seasonal",
+      };
     case "cold-drinks":
       return {
         label: "Cold Comfort",
