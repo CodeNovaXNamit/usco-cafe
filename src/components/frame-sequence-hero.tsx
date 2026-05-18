@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFrameAssetUrl, totalFrames } from "@/data/site";
+import { UscoLoader } from "@/components/usco-loader";
 
 function getFrameUrl(index: number) {
   return getFrameAssetUrl(index);
@@ -12,6 +13,15 @@ function getFrameUrl(index: number) {
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
 }
+
+const FRAME_LOADING_MESSAGES = [
+  "Your coffee is getting ready...",
+  "Brewing something warm for you...",
+  "Pouring the first frame...",
+  "A slower cup is on the way...",
+  "Setting your quiet corner...",
+  "Almost ready to serve...",
+] as const;
 
 function drawCoverFrame(canvas: HTMLCanvasElement, image: HTMLImageElement) {
   const ctx = canvas.getContext("2d");
@@ -50,6 +60,7 @@ export function FrameSequenceHero() {
   const endOverlayRef = useRef<HTMLDivElement | null>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const [loadedCount, setLoadedCount] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [pinMode, setPinMode] = useState<"before" | "fixed" | "bottom">("before");
   const hasLoggedFrameInfoRef = useRef(false);
@@ -103,6 +114,16 @@ export function FrameSequenceHero() {
 
     return () => {
       motionMedia.removeEventListener("change", updateMotion);
+    };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setMessageIndex((current) => (current + 1) % FRAME_LOADING_MESSAGES.length);
+    }, 1600);
+
+    return () => {
+      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -251,6 +272,7 @@ export function FrameSequenceHero() {
 
   const ready = reducedMotion || loadedCount >= totalFrames;
   const loadingProgress = reducedMotion ? 100 : Math.round((loadedCount / totalFrames) * 100);
+  const loadingMessage = FRAME_LOADING_MESSAGES[messageIndex % FRAME_LOADING_MESSAGES.length];
   const pinClassName = useMemo(() => {
     if (pinMode === "fixed") {
       return "frame-sequence-pin is-fixed";
@@ -265,33 +287,41 @@ export function FrameSequenceHero() {
     <section ref={sectionRef} className={`frame-sequence-section ${reducedMotion ? "frame-sequence-section--reduced" : ""}`}>
       <div ref={pinRef} className={pinClassName}>
         {!ready ? (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white text-matcha-deep">
-            <div className="px-4 text-center font-display text-5xl tracking-[0.12em] sm:text-6xl">USCO</div>
-            <p className="mt-3 px-4 text-center font-accent text-xs uppercase tracking-[0.35em] text-matcha-mid sm:text-sm">
-              Brewing something...
-            </p>
-            <div className="mt-8 h-px w-48 overflow-hidden bg-matcha-light sm:mt-10 sm:w-60">
-              <div
-                className="h-full bg-matcha-mid transition-[width] duration-300"
-                style={{ width: `${loadingProgress}%` }}
-              />
-            </div>
-          </div>
+          <UscoLoader
+            className="frame-loading-overlay"
+            message={loadingMessage}
+            progress={loadingProgress}
+            contentClassName="frame-loading-content"
+            logoClassName="frame-loading-logo"
+            taglineClassName="frame-loading-tagline"
+            progressClassName="frame-loading-progress"
+            progressBarClassName="frame-loading-progress-bar"
+          />
         ) : null}
 
         {reducedMotion ? (
           <img
             src={getFrameUrl(0)}
             alt="USCO cafe exterior"
-            className="frame-sequence-canvas object-cover"
+            className={`frame-sequence-canvas object-cover ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
           />
         ) : (
-          <canvas ref={canvasRef} className="frame-sequence-canvas" aria-hidden />
+          <canvas
+            ref={canvasRef}
+            className={`frame-sequence-canvas ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
+            aria-hidden
+          />
         )}
 
-        <div className="frame-sequence-vignette" aria-hidden="true" />
+        <div
+          className={`frame-sequence-vignette ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
+          aria-hidden="true"
+        />
 
-        <div ref={startOverlayRef} className="frame-sequence-start-overlay">
+        <div
+          ref={startOverlayRef}
+          className={`frame-sequence-start-overlay ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
+        >
           <article className="frame-glass-card frame-glass-card--left">
             <p className="frame-glass-kicker">COFFEE + TOAST + WORK</p>
             <h2>Somewhere softer than the usual rush.</h2>
@@ -305,7 +335,10 @@ export function FrameSequenceHero() {
           </article>
         </div>
 
-        <div ref={endOverlayRef} className="frame-sequence-end-overlay">
+        <div
+          ref={endOverlayRef}
+          className={`frame-sequence-end-overlay ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
+        >
           <article className="frame-glass-card frame-glass-card--end">
             <p className="frame-glass-kicker">A LITTLE CUP FOR YOU</p>
             <h2>Coffee for you.</h2>

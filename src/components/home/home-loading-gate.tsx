@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { UscoLoader } from "@/components/usco-loader";
 
 type HomeLoadingGateProps = {
   children: React.ReactNode;
@@ -63,6 +64,8 @@ export function HomeLoadingGate({ children }: HomeLoadingGateProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    document.documentElement.classList.add("site-is-loading");
+
     let cancelled = false;
     const startedAt = performance.now();
     const forceReleaseTimer = window.setTimeout(() => {
@@ -109,18 +112,23 @@ export function HomeLoadingGate({ children }: HomeLoadingGateProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isLoading) {
+      window.dispatchEvent(new Event("site:loading-complete"));
+      document.documentElement.classList.remove("site-is-loading");
+    }
+  }, [isLoading]);
+
   return (
     <div ref={rootRef}>
-      {children}
+      <div style={{ visibility: isLoading ? "hidden" : "visible" }} aria-hidden={isLoading}>
+        {children}
+      </div>
       <div
         className={`loading-screen loading-screen--overlay ${isLoading ? "is-visible" : "is-hidden"}`}
         aria-hidden={!isLoading}
       >
-        <div className="loading-screen__mark">USCO</div>
-        <p className="loading-screen__label">Always Brewing Something</p>
-        <div className="loading-screen__bar" aria-hidden>
-          <div className="loading-screen__bar-fill" />
-        </div>
+        <UscoLoader />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
+import { UscoLoader } from "@/components/usco-loader";
 import {
   Cormorant_Garamond,
   Cormorant_SC,
@@ -93,9 +94,34 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${displayFont.variable} ${bodyFont.variable} ${uiFont.variable} ${accentFont.variable} h-full scroll-smooth antialiased`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${uiFont.variable} ${accentFont.variable} h-full scroll-smooth antialiased site-is-loading`}
     >
       <body className="min-h-full flex flex-col">
+        <UscoLoader id="site-initial-loader" className="site-loading-overlay" />
+        <Script id="site-initial-loader-control" strategy="beforeInteractive">
+          {`
+            (function () {
+              var done = false;
+              function finish() {
+                if (done) return;
+                done = true;
+                var root = document.documentElement;
+                var overlay = document.getElementById('site-initial-loader');
+                if (overlay) {
+                  overlay.classList.add('is-leaving');
+                  window.setTimeout(function () {
+                    overlay.remove();
+                    root.classList.remove('site-is-loading');
+                  }, 430);
+                } else {
+                  root.classList.remove('site-is-loading');
+                }
+              }
+              window.addEventListener('site:loading-complete', finish, { once: true });
+              window.setTimeout(finish, 10000);
+            })();
+          `}
+        </Script>
         {children}
         <Analytics />
         <Script

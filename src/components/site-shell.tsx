@@ -14,7 +14,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className={`site-shell min-h-screen text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
+    <div className={`site-shell min-h-screen flex flex-col text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
       <HeaderHeightSync />
       <header className={`site-header ${isHomePage ? "site-header--home" : "border-b border-matcha-light/70"}`}>
         <div className="site-header-shell">
@@ -49,8 +49,8 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
           </div>
         </div>
       </header>
-      <main className={`site-main relative z-10 ${isHomePage ? "site-main--flush" : ""}`}>{children}</main>
-      <footer className="relative z-20 mt-16 bg-matcha-deep text-white sm:mt-24">
+      <main className={`site-main relative z-10 flex-1 ${isHomePage ? "site-main--flush" : ""}`}>{children}</main>
+      <footer className="site-footer relative z-20 mt-16 bg-matcha-deep text-white sm:mt-24">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-10">
           <div>
             <div className="font-display text-[2.2rem] tracking-[0.08em] sm:text-4xl">USCO</div>
