@@ -110,7 +110,6 @@ export default function RootLayout({
                 if (overlay) {
                   overlay.classList.add('is-leaving');
                   window.setTimeout(function () {
-                    overlay.remove();
                     root.classList.remove('site-is-loading');
                   }, 430);
                 } else {
