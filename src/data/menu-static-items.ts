@@ -38,7 +38,7 @@ export const staticMenuItems: Array<Omit<MenuItem, "sortOrder" | "visible" | "pr
     name: 'Bun Maska + Cutting Chai',
     description: 'Small plates and cafe bites.',
     category: 'food-snacks',
-    image: '/menu-items/New-addon/Nibbles/Bun Maska + Cutting Chai.png',
+    image: '/menu-items/New-addon/Nibbles/bun-maska-cutting-chai.png',
     tags: [],
   },
   {

@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { totalFrames } from "@/data/site";
-
-const FRAME_VERSION = "parallax-test-fixedpin";
+import { getFrameAssetUrl, totalFrames } from "@/data/site";
 
 function getFrameUrl(index: number) {
-  return `/api/frames/${index}?v=${FRAME_VERSION}`;
+  return getFrameAssetUrl(index);
 }
 
 function clamp(value: number, min: number, max: number) {
