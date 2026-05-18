@@ -18,6 +18,7 @@ type MenuPrice = MenuItem["price"];
 const MENU_CSV_PATH = path.join(process.cwd(), "menu", "menu_data.csv");
 const MENU_IMAGE_DIR = path.join(process.cwd(), "public", "menu-items");
 const MENU_ADDON_DIR = path.join(MENU_IMAGE_DIR, "addon");
+const MENU_NEW_ADDON_DIR = path.join(MENU_IMAGE_DIR, "New-addon");
 const SUPPORTED_MENU_IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
 const MENU_IMAGE_ALIASES: Record<string, string> = {
@@ -185,16 +186,18 @@ function toTitleCase(raw: string) {
 }
 
 function mapAddonFolderCategory(folderName: string): MenuItem["category"] {
-  switch (folderName.toLowerCase()) {
+  switch (folderName.trim().toLowerCase()) {
     case "hot":
       return "coffee";
     case "cold":
       return "cold-drinks";
     case "food":
+    case "nibbles":
       return "food-snacks";
     case "premium":
     case "specials":
     case "usco-specials":
+    case "usco specials":
       return "usco-specials";
     case "gelato":
       return "gelato";
@@ -204,10 +207,20 @@ function mapAddonFolderCategory(folderName: string): MenuItem["category"] {
 }
 
 async function readAddonMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
-  try {
-    const categoryDirs = await readdir(MENU_ADDON_DIR, { withFileTypes: true });
-    const existingIds = new Set(existing.map((item) => item.id));
-    const additions: MenuItem[] = [];
+  const addonRoots = [
+    { diskPath: MENU_ADDON_DIR, publicPrefix: "/menu-items/addon" },
+    { diskPath: MENU_NEW_ADDON_DIR, publicPrefix: "/menu-items/New-addon" },
+  ];
+  const existingIds = new Set(existing.map((item) => item.id));
+  const additions: MenuItem[] = [];
+
+  for (const root of addonRoots) {
+    let categoryDirs;
+    try {
+      categoryDirs = await readdir(root.diskPath, { withFileTypes: true });
+    } catch {
+      continue;
+    }
 
     for (const dirEntry of categoryDirs) {
       if (!dirEntry.isDirectory()) {
@@ -215,7 +228,7 @@ async function readAddonMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
       }
 
       const category = mapAddonFolderCategory(dirEntry.name);
-      const categoryPath = path.join(MENU_ADDON_DIR, dirEntry.name);
+      const categoryPath = path.join(root.diskPath, dirEntry.name);
       const files = await readdir(categoryPath, { withFileTypes: true });
       const currentCategoryMaxOrder = Math.max(
         0,
@@ -260,7 +273,7 @@ async function readAddonMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
           description,
           price: 0,
           category,
-          image: `/menu-items/addon/${dirEntry.name}/${fileEntry.name}`,
+          image: `${root.publicPrefix}/${dirEntry.name}/${fileEntry.name}`,
           tags: [],
           visible: true,
           sortOrder: nextSortOrder,
@@ -269,11 +282,9 @@ async function readAddonMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
         nextSortOrder += 1;
       }
     }
-
-    return additions;
-  } catch {
-    return [];
   }
+
+  return additions;
 }
 
 async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {

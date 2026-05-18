@@ -11,6 +11,7 @@ type SiteShellProps = {
 export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   const hasInnerPageBackdrop = ["/menu", "/gallery", "/find-us"].includes(currentPath);
   const isHomePage = currentPath === "/";
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className={`site-shell min-h-screen text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
@@ -88,6 +89,19 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
             </a>
             <p className="font-sans text-xs uppercase tracking-[0.18em] sm:text-sm sm:tracking-[0.2em]">Open 10am - 8pm</p>
             <p>No WiFi password. No rush. No. 4.</p>
+          </div>
+        </div>
+        <div className="border-t border-matcha-light/25">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-[11px] uppercase tracking-[0.14em] text-matcha-light sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10">
+            <p>© {currentYear} USCO Cafe. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <Link href="/privacy-policy" className="hover:text-white">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-white">
+                Terms
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
