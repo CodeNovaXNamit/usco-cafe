@@ -546,9 +546,13 @@ export const findUs = {
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.3424860495943!2d77.2164567!3d28.547473399999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce34ee3b5c2d5%3A0xc861a88ed99ee032!2sUSCO%20CAFE!5e1!3m2!1sen!2sin!4v1777708200413!5m2!1sen!2sin",
 };
 
+// Use the Google Business Profile "Get more reviews" link when possible.
+// Fallback format: https://search.google.com/local/writereview?placeid=PLACE_ID
+// Users still need to be signed into Google and submit the review manually.
+export const googleReviewUrl = "https://g.page/r/CTLgntmOqGHIEBM/review";
+
 export const googleReviewCta = {
-  href: "https://www.google.com/search?hl=en-IN&gl=in&q=USCO+CAFE+Shahpur+Jat#lrd=0x390ce34ee3b5c2d5:0xc861a88ed99ee032,3,,,",
-  mobileHref: "https://maps.google.com/?cid=14441334767921663538",
+  href: googleReviewUrl,
   ratingLabel: "4.7 on Google",
   visitorLabel: "139+ happy visitors",
 };

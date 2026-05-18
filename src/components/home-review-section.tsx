@@ -1,5 +1,3 @@
-"use client";
-
 const reviewItems = [
   {
     emoji: "🍵",
@@ -29,22 +27,11 @@ const reviewItems = [
 
 type HomeReviewSectionProps = {
   reviewUrl: string;
-  mobileReviewUrl?: string;
   ratingLabel: string;
   visitorLabel: string;
 };
-
-function isMobileDevice() {
-  if (typeof navigator === "undefined") {
-    return false;
-  }
-
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-}
-
-export function HomeReviewSection({ reviewUrl, mobileReviewUrl, ratingLabel, visitorLabel }: HomeReviewSectionProps) {
+export function HomeReviewSection({ reviewUrl, ratingLabel, visitorLabel }: HomeReviewSectionProps) {
   const repeatedReviews = [...reviewItems, ...reviewItems];
-  const resolvedReviewUrl = mobileReviewUrl && isMobileDevice() ? mobileReviewUrl : reviewUrl;
 
   return (
     <section className="home-review-lounge">
@@ -83,9 +70,9 @@ export function HomeReviewSection({ reviewUrl, mobileReviewUrl, ratingLabel, vis
 
           <div>
             <a
-              href={resolvedReviewUrl}
+              href={reviewUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="home-motion-text home-motion-text--drift home-review-button"
             >
               Write a Google Review

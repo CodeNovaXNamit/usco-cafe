@@ -24,7 +24,6 @@ export default function DesktopHome() {
       />
       <HomeReviewSection
         reviewUrl={googleReviewCta.href}
-        mobileReviewUrl={googleReviewCta.mobileHref}
         ratingLabel={googleReviewCta.ratingLabel}
         visitorLabel={googleReviewCta.visitorLabel}
       />

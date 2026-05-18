@@ -105,7 +105,6 @@ export default function PhoneHome() {
       />
       <HomeReviewSection
         reviewUrl={googleReviewCta.href}
-        mobileReviewUrl={googleReviewCta.mobileHref}
         ratingLabel={googleReviewCta.ratingLabel}
         visitorLabel={googleReviewCta.visitorLabel}
       />
