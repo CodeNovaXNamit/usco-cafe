@@ -1,9 +1,9 @@
-﻿import type { MenuItem } from "@/data/site";
+import type { MenuItem } from "@/data/site";
 
 export const staticMenuItems: Array<Omit<MenuItem, "sortOrder" | "visible" | "price"> & { price?: MenuItem["price"]; tags?: MenuItem["tags"] }> = [
   {
     id: 'coffee-cartodo',
-    name: 'Cartodo',
+    name: 'Cortado',
     description: 'Hot coffee, quietly served.',
     category: 'coffee',
     image: '/menu-items/addon/hot/cartodo - Copy.jpeg',
