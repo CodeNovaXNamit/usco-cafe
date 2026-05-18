@@ -1,10 +1,15 @@
-export const frameBaseUrl = "/api/frames";
-export const frameVersion = "animation-reexport-192";
+import { frameFiles } from "@/data/frame-manifest";
 
-export const totalFrames = 192;
+export const frameBaseUrl = "/frames/usco-home";
+export const frameVersion = "static-public-frames";
+
+export const totalFrames = frameFiles.length;
 
 export function getFrameAssetUrl(index: number) {
-  return `${frameBaseUrl}/${index}?v=${frameVersion}`;
+  if (index < 0 || index >= frameFiles.length) {
+    return frameFiles[0] ?? `${frameBaseUrl}/frame_001.webp`;
+  }
+  return frameFiles[index];
 }
 
 export const navLinks = [

@@ -1,6 +1,6 @@
-import "server-only";
+﻿import "server-only";
 
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import {
   adminStats as fallbackAdminStats,
@@ -10,38 +10,14 @@ import {
   type GalleryItem,
   type MenuItem,
 } from "@/data/site";
+import { menuImageManifest } from "@/data/menu-image-manifest";
+import { staticMenuItems } from "@/data/menu-static-items";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type PriceLogEntry = [string, string, string, string];
 type MenuPrice = MenuItem["price"];
 
 const MENU_CSV_PATH = path.join(process.cwd(), "menu", "menu_data.csv");
-const MENU_IMAGE_DIR = path.join(process.cwd(), "public", "menu-items");
-const MENU_ADDON_DIR = path.join(MENU_IMAGE_DIR, "addon");
-const MENU_NEW_ADDON_DIR = path.join(MENU_IMAGE_DIR, "New-addon");
-const MENU_MATCHA_DIR = path.join(MENU_IMAGE_DIR, "Matcha");
-const SUPPORTED_MENU_IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp"]);
-
-type AddonRootConfig = {
-  diskPath: string;
-  publicPrefix: string;
-};
-
-type AddonFileRecord = {
-  category: MenuItem["category"];
-  dirName: string;
-  fileName: string;
-  rawBaseName: string;
-};
-
-const ADDON_ROOTS: AddonRootConfig[] = [
-  { diskPath: MENU_ADDON_DIR, publicPrefix: "/menu-items/addon" },
-  { diskPath: MENU_NEW_ADDON_DIR, publicPrefix: "/menu-items/New-addon" },
-];
-
-const menuImagePathCache = new Map<string, string | undefined>();
-let menuImageFilenameSetPromise: Promise<Set<string>> | null = null;
-let addonFileRecordCachePromise: Promise<Map<string, AddonFileRecord[]>> | null = null;
 
 const MENU_IMAGE_ALIASES: Record<string, string> = {
   "anandini-tea": "anandini-tea",
@@ -54,6 +30,7 @@ const MENU_IMAGE_ALIASES: Record<string, string> = {
   "regular-fries-peri-peri-fries": "regular-fries-peri-peri-fries",
   "sweet-lime-juice-mosambi": "sweet-lime-juice",
 };
+
 const SHIBUYA_HONEY_TOAST_SLUG = "shibuya-honey-toast";
 const SHIBUYA_HONEY_TOAST_IMAGE_PATH = "/menu-items/Shibuya Honey Toast/Shibuya Honey Toast.png";
 
@@ -72,6 +49,8 @@ function mapMenuCategory(category: string): MenuItem["category"] {
       return "gelato";
     case "seasonal":
       return "seasonal";
+    case "shibuya_honey_toast":
+      return "shibuya-honey-toast";
     default:
       return "coffee";
   }
@@ -156,76 +135,6 @@ function slugifyMenuName(name: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-function isShibuyaHoneyToastItem(item: Pick<MenuItem, "id" | "name">) {
-  const idSlug = item.id.includes("-") ? item.id.split("-").slice(1).join("-") : item.id;
-  const nameSlug = slugifyMenuName(item.name);
-  return idSlug === SHIBUYA_HONEY_TOAST_SLUG || nameSlug === SHIBUYA_HONEY_TOAST_SLUG;
-}
-
-function normalizeMenuCategory(item: MenuItem): MenuItem {
-  if (isShibuyaHoneyToastItem(item)) {
-    return {
-      ...item,
-      category: "shibuya-honey-toast",
-      image: SHIBUYA_HONEY_TOAST_IMAGE_PATH,
-      sortOrder: 1,
-    };
-  }
-
-  return item;
-}
-
-async function getMenuImagePath(name: string) {
-  const slug = slugifyMenuName(name);
-  const imageSlug = MENU_IMAGE_ALIASES[slug] ?? slug;
-  const cacheKey = imageSlug;
-
-  if (menuImagePathCache.has(cacheKey)) {
-    return menuImagePathCache.get(cacheKey);
-  }
-
-  const fileNames = await getMenuImageFilenameSet();
-
-  for (const extension of SUPPORTED_MENU_IMAGE_EXTENSIONS) {
-    const fileName = `${imageSlug}${extension}`;
-    if (fileNames.has(fileName)) {
-      const resolvedPath = `/menu-items/${fileName}`;
-      menuImagePathCache.set(cacheKey, resolvedPath);
-      return resolvedPath;
-    }
-  }
-
-  menuImagePathCache.set(cacheKey, undefined);
-  return undefined;
-}
-
-async function getMenuImageFilenameSet() {
-  if (!menuImageFilenameSetPromise) {
-    menuImageFilenameSetPromise = readdir(MENU_IMAGE_DIR, { withFileTypes: true })
-      .then((entries) => {
-        const fileNames = new Set<string>();
-
-        for (const entry of entries) {
-          if (!entry.isFile()) {
-            continue;
-          }
-
-          const extension = path.extname(entry.name).toLowerCase();
-          if (!SUPPORTED_MENU_IMAGE_EXTENSIONS.has(extension)) {
-            continue;
-          }
-
-          fileNames.add(entry.name);
-        }
-
-        return fileNames;
-      })
-      .catch(() => new Set<string>());
-  }
-
-  return menuImageFilenameSetPromise;
-}
-
 function buildMenuItemDescription(category: string, name: string) {
   const group = category.trim().toLowerCase();
 
@@ -251,6 +160,10 @@ function buildMenuItemDescription(category: string, name: string) {
     return "Slow churned gelato, served cold.";
   }
 
+  if (group === "matcha") {
+    return "Matcha creations for calm, creamy sips.";
+  }
+
   if (group === "premium" || group === "specials" || group === "usco specials") {
     return "House specials for the slower side of the day.";
   }
@@ -258,203 +171,92 @@ function buildMenuItemDescription(category: string, name: string) {
   return "";
 }
 
-function toTitleCase(raw: string) {
-  return raw
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function mapAddonFolderCategory(folderName: string): MenuItem["category"] {
-  switch (folderName.trim().toLowerCase()) {
-    case "hot":
-      return "coffee";
-    case "matcha":
-      return "matcha";
-    case "cold":
-      return "cold-drinks";
-    case "food":
-    case "nibbles":
-      return "food-snacks";
-    case "premium":
-    case "specials":
-    case "usco-specials":
-    case "usco specials":
-      return "usco-specials";
-    case "gelato":
-      return "gelato";
-    default:
-      return "seasonal";
-  }
-}
-
-async function readAddonMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
-  const existingIds = new Set(existing.map((item) => item.id));
-  const additions: MenuItem[] = [];
-  const addonFileRecordsByRoot = await getAddonFileRecordsByRoot();
-
-  for (const root of ADDON_ROOTS) {
-    const rootRecords = addonFileRecordsByRoot.get(root.publicPrefix) ?? [];
-    const byCategory = new Map<MenuItem["category"], AddonFileRecord[]>();
-
-    for (const record of rootRecords) {
-      const list = byCategory.get(record.category) ?? [];
-      list.push(record);
-      byCategory.set(record.category, list);
-    }
-
-    for (const [category, records] of byCategory) {
-      const currentCategoryMaxOrder = Math.max(
-        0,
-        ...existing.filter((item) => item.category === category).map((item) => item.sortOrder),
-        ...additions.filter((item) => item.category === category).map((item) => item.sortOrder),
-      );
-      let nextSortOrder = currentCategoryMaxOrder + 1;
-
-      for (const record of records) {
-        const displayName = toTitleCase(record.rawBaseName.replace(/\s+/g, " "));
-        const slug = slugifyMenuName(record.rawBaseName);
-        const id = `${category}-${slug}`;
-
-        if (!slug || existingIds.has(id)) {
-          continue;
-        }
-
-        const description = buildMenuItemDescription(
-          category === "coffee"
-            ? "hot"
-            : category === "cold-drinks"
-              ? "cold"
-              : category === "food-snacks"
-                ? "nibbles"
-                : category,
-          displayName,
-        );
-
-        additions.push({
-          id,
-          name: displayName,
-          description,
-          price: 0,
-          category,
-          image: `${root.publicPrefix}/${record.dirName}/${record.fileName}`,
-          tags: [],
-          visible: true,
-          sortOrder: nextSortOrder,
-        });
-        existingIds.add(id);
-        nextSortOrder += 1;
-      }
-    }
+function normalizePublicImagePath(value?: string | null) {
+  if (!value) {
+    return undefined;
   }
 
-  return additions;
-}
-
-async function readMatchaMenuItems(existing: MenuItem[]): Promise<MenuItem[]> {
-  const existingIds = new Set(existing.map((item) => item.id));
-  let files;
-  try {
-    files = await readdir(MENU_MATCHA_DIR, { withFileTypes: true });
-  } catch {
-    return [];
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
   }
 
-  let nextSortOrder =
-    Math.max(0, ...existing.filter((item) => item.category === "matcha").map((item) => item.sortOrder)) + 1;
-  const additions: MenuItem[] = [];
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith("/")) {
+    return trimmed;
+  }
 
-  for (const fileEntry of files) {
-    if (!fileEntry.isFile()) {
+  return `/${trimmed.replace(/^\/+/, "")}`;
+}
+
+function resolveMenuImageByName(name: string) {
+  const slug = slugifyMenuName(name);
+  const aliasSlug = MENU_IMAGE_ALIASES[slug] ?? slug;
+  return menuImageManifest[slug] ?? menuImageManifest[aliasSlug];
+}
+
+function resolveMenuImage(item: Pick<MenuItem, "id" | "name"> & { image?: string | null }) {
+  const explicit = normalizePublicImagePath(item.image);
+  if (explicit) {
+    return explicit;
+  }
+
+  const idSlug = item.id.includes("-") ? item.id.split("-").slice(1).join("-") : item.id;
+  return menuImageManifest[item.id] ?? menuImageManifest[idSlug] ?? resolveMenuImageByName(item.name);
+}
+
+function isShibuyaHoneyToastItem(item: Pick<MenuItem, "id" | "name">) {
+  const idSlug = item.id.includes("-") ? item.id.split("-").slice(1).join("-") : item.id;
+  const nameSlug = slugifyMenuName(item.name);
+  return idSlug === SHIBUYA_HONEY_TOAST_SLUG || nameSlug === SHIBUYA_HONEY_TOAST_SLUG;
+}
+
+function normalizeMenuItem(item: MenuItem): MenuItem {
+  const normalized: MenuItem = {
+    ...item,
+    image: resolveMenuImage(item),
+  };
+
+  if (isShibuyaHoneyToastItem(normalized)) {
+    normalized.category = "shibuya-honey-toast";
+    normalized.image = SHIBUYA_HONEY_TOAST_IMAGE_PATH;
+  }
+
+  return normalized;
+}
+
+function mergeStaticMenuItems(baseItems: MenuItem[]) {
+  const result = [...baseItems];
+  const existingIds = new Set(result.map((item) => item.id));
+  const maxByCategory = new Map<MenuItem["category"], number>();
+
+  for (const item of result) {
+    const current = maxByCategory.get(item.category) ?? 0;
+    maxByCategory.set(item.category, Math.max(current, item.sortOrder));
+  }
+
+  for (const item of staticMenuItems) {
+    if (existingIds.has(item.id)) {
       continue;
     }
 
-    const extension = path.extname(fileEntry.name).toLowerCase();
-    if (!SUPPORTED_MENU_IMAGE_EXTENSIONS.has(extension)) {
-      continue;
-    }
+    const nextSortOrder = (maxByCategory.get(item.category) ?? 0) + 1;
+    maxByCategory.set(item.category, nextSortOrder);
 
-    const rawBaseName = path.parse(fileEntry.name).name.replace(/\s*-\s*copy$/i, "").trim();
-    const displayName = toTitleCase(rawBaseName.replace(/\s+/g, " "));
-    const slug = slugifyMenuName(rawBaseName);
-    const id = `matcha-${slug}`;
-
-    if (!slug || existingIds.has(id)) {
-      continue;
-    }
-
-    additions.push({
-      id,
-      name: displayName,
-      description: "Matcha creations for calm, creamy sips.",
-      price: 0,
-      category: "matcha",
-      image: `/menu-items/Matcha/${fileEntry.name}`,
-      tags: ["New"],
+    result.push({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price ?? 0,
+      category: item.category,
+      image: item.image,
+      tags: item.tags ?? [],
       visible: true,
       sortOrder: nextSortOrder,
     });
-    existingIds.add(id);
-    nextSortOrder += 1;
+    existingIds.add(item.id);
   }
 
-  return additions;
-}
-
-async function getAddonFileRecordsByRoot() {
-  if (!addonFileRecordCachePromise) {
-    addonFileRecordCachePromise = (async () => {
-      const byRoot = new Map<string, AddonFileRecord[]>();
-
-      for (const root of ADDON_ROOTS) {
-        const records: AddonFileRecord[] = [];
-
-        let categoryDirs;
-        try {
-          categoryDirs = await readdir(root.diskPath, { withFileTypes: true });
-        } catch {
-          byRoot.set(root.publicPrefix, records);
-          continue;
-        }
-
-        for (const dirEntry of categoryDirs) {
-          if (!dirEntry.isDirectory()) {
-            continue;
-          }
-
-          const category = mapAddonFolderCategory(dirEntry.name);
-          const categoryPath = path.join(root.diskPath, dirEntry.name);
-          const files = await readdir(categoryPath, { withFileTypes: true });
-
-          for (const fileEntry of files) {
-            if (!fileEntry.isFile()) {
-              continue;
-            }
-
-            const extension = path.extname(fileEntry.name).toLowerCase();
-            if (!SUPPORTED_MENU_IMAGE_EXTENSIONS.has(extension)) {
-              continue;
-            }
-
-            const rawBaseName = path.parse(fileEntry.name).name.replace(/\s*-\s*copy$/i, "").trim();
-            records.push({
-              category,
-              dirName: dirEntry.name,
-              fileName: fileEntry.name,
-              rawBaseName,
-            });
-          }
-        }
-
-        byRoot.set(root.publicPrefix, records);
-      }
-
-      return byRoot;
-    })();
-  }
-
-  return addonFileRecordCachePromise;
+  return result;
 }
 
 async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {
@@ -475,25 +277,24 @@ async function readMenuItemsFromCsv(): Promise<MenuItem[] | null> {
       return null;
     }
 
-    return Promise.all(
-      lines.slice(1).map(async (line, index) => {
+    return lines.slice(1).map((line, index) => {
       const [category, itemName, price] = parseCsvLine(line) as [string, string, string];
       const vegan = /\(vegan\)/i.test(itemName);
       const cleanName = itemName.replace(/\s*\(vegan\)\s*/i, "").trim();
+      const itemId = `${mapCsvMenuCategory(category)}-${slugifyMenuName(cleanName) || index + 1}`;
 
       return {
-        id: `${mapCsvMenuCategory(category)}-${slugifyMenuName(cleanName) || index + 1}`,
+        id: itemId,
         name: cleanName,
         description: buildMenuItemDescription(category, cleanName),
         price: parseMenuPrice(price),
         category: mapCsvMenuCategory(category),
-        image: await getMenuImagePath(cleanName),
+        image: resolveMenuImage({ id: itemId, name: cleanName }),
         tags: vegan ? (["Vegan"] as MenuItem["tags"]) : [],
         visible: true,
         sortOrder: index + 1,
       } satisfies MenuItem;
-      }),
-    );
+    });
   } catch {
     return null;
   }
@@ -511,25 +312,23 @@ function mapGalleryCategory(category: string): GalleryItem["category"] {
   }
 }
 
+function finalizeMenuItems(source: MenuItem[]) {
+  return mergeStaticMenuItems(source)
+    .map(normalizeMenuItem)
+    .filter((item) => item.category !== "gelato" || Boolean(item.image));
+}
+
 export async function getMenuItems(): Promise<MenuItem[]> {
   const csvItems = await readMenuItemsFromCsv();
 
   if (csvItems && csvItems.length > 0) {
-    const addonItems = await readAddonMenuItems(csvItems);
-    const matchaItems = await readMatchaMenuItems([...csvItems, ...addonItems]);
-    return [...csvItems, ...addonItems, ...matchaItems]
-      .map(normalizeMenuCategory)
-      .filter((item) => item.category !== "gelato" || Boolean(item.image));
+    return finalizeMenuItems(csvItems);
   }
 
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    const addonItems = await readAddonMenuItems(fallbackMenuItems);
-    const matchaItems = await readMatchaMenuItems([...fallbackMenuItems, ...addonItems]);
-    return [...fallbackMenuItems, ...addonItems, ...matchaItems]
-      .map(normalizeMenuCategory)
-      .filter((item) => item.category !== "gelato" || Boolean(item.image));
+    return finalizeMenuItems(fallbackMenuItems);
   }
 
   const { data, error } = await supabase
@@ -540,14 +339,10 @@ export async function getMenuItems(): Promise<MenuItem[]> {
     .order("sort_order", { ascending: true });
 
   if (error || !data) {
-    const addonItems = await readAddonMenuItems(fallbackMenuItems);
-    const matchaItems = await readMatchaMenuItems([...fallbackMenuItems, ...addonItems]);
-    return [...fallbackMenuItems, ...addonItems, ...matchaItems]
-      .map(normalizeMenuCategory)
-      .filter((item) => item.category !== "gelato" || Boolean(item.image));
+    return finalizeMenuItems(fallbackMenuItems);
   }
 
-  const dbItems = data.map((item) => ({
+  const dbItems: MenuItem[] = data.map((item) => ({
     id: item.id,
     name: item.name,
     description: item.description ?? "",
@@ -558,11 +353,8 @@ export async function getMenuItems(): Promise<MenuItem[]> {
     visible: item.visible ?? true,
     sortOrder: item.sort_order ?? 0,
   }));
-  const addonItems = await readAddonMenuItems(dbItems);
-  const matchaItems = await readMatchaMenuItems([...dbItems, ...addonItems]);
-  return [...dbItems, ...addonItems, ...matchaItems]
-    .map(normalizeMenuCategory)
-    .filter((item) => item.category !== "gelato" || Boolean(item.image));
+
+  return finalizeMenuItems(dbItems);
 }
 
 export async function getGalleryItems(): Promise<GalleryItem[]> {

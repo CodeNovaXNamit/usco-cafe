@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingExcludes: {
+    "/*": [
+      "./public/menu-items/**/*",
+      "./public/gallery/**/*",
+      "./public/media/**/*",
+      "./animation/**/*",
+    ],
+  },
 };
 
 export default nextConfig;
