@@ -1690,7 +1690,9 @@ button {
 }
 
 .gallery-premium-media img,
-.gallery-premium-media video {
+.gallery-premium-media video,
+.gallery-premium-video,
+.gallery-premium-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
