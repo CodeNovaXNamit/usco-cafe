@@ -3,18 +3,14 @@ import { FrameSequenceHero } from "@/components/frame-sequence-hero";
 import { DesktopStoryCards } from "./desktop-story-cards";
 import {
   HomeExploreSection,
-  HomeIntroSection,
-  HomePillarsSection,
 } from "@/components/home/shared/home-sections";
 import { googleReviewCta } from "@/data/site";
-import { desktopTeaserCards, homeIntroContent } from "../shared/home-content";
+import { desktopTeaserCards } from "../shared/home-content";
 
 export default function DesktopHome() {
   return (
     <div className="home-motion-surface">
       <FrameSequenceHero />
-      <HomeIntroSection title={homeIntroContent.title} body={homeIntroContent.body} className="home-philosophy-section--lead" />
-      <HomePillarsSection className="" />
       <DesktopStoryCards />
       <HomeExploreSection
         cards={desktopTeaserCards}

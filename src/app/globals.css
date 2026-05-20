@@ -10,6 +10,7 @@
   --warm-gold: #c8973a;
   --charcoal: #1e1e1a;
   --glass-white: rgba(248, 246, 241, 0.72);
+  --usco-label-sage: rgba(53, 60, 48, 0.78);
   --background: var(--white);
   --foreground: var(--charcoal);
 }
@@ -129,7 +130,7 @@ button {
   font-weight: 800;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.9);
+  color: var(--usco-label-sage);
 }
 
 .site-brand-copy em {
@@ -159,7 +160,7 @@ button {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(126, 154, 104, 0.22);
-  color: rgba(126, 154, 104, 0.95);
+  color: var(--usco-label-sage);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -335,7 +336,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.42em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.82);
+  color: var(--usco-label-sage);
 }
 
 .frame-loading-progress {
@@ -494,7 +495,7 @@ button {
   font-size: 0.72rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.96);
+  color: var(--usco-label-sage);
 }
 
 .frame-glass-card h2 {
@@ -601,7 +602,7 @@ button {
 }
 
 .frame-sequence-pin .frame-glass-kicker {
-  color: rgba(126, 154, 104, 0.96);
+  color: var(--usco-label-sage);
 }
 
 .frame-sequence-pin .frame-glass-card h2 {
@@ -802,7 +803,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.82);
+  color: var(--usco-label-sage);
 }
 
 .home-philosophy-section {
@@ -1025,7 +1026,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.9);
+  color: var(--usco-label-sage);
 }
 
 .home-review-lounge {
@@ -1569,7 +1570,7 @@ button {
 }
 
 .premium-menu-category {
-  color: color-mix(in srgb, var(--menu-accent) 78%, #526b4e);
+  color: var(--usco-label-sage);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.22em;
@@ -2027,7 +2028,7 @@ button {
   font-weight: 800;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.9);
+  color: var(--usco-label-sage);
 }
 
 .find-card-topline a {
@@ -2464,7 +2465,7 @@ button {
   font-size: clamp(3.4rem, 6vw, 5.6rem);
   line-height: 1;
   letter-spacing: 0.22em;
-  color: #263025;
+  color: #526b4e;
 }
 
 .site-loading-tagline {
@@ -2473,7 +2474,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.42em;
   text-transform: uppercase;
-  color: rgba(126, 154, 104, 0.82);
+  color: var(--usco-label-sage);
 }
 
 .site-loading-progress {
@@ -2511,7 +2512,7 @@ button {
   font-size: 0.75rem;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: var(--matcha-mid);
+  color: var(--usco-label-sage);
   text-align: center;
 }
 
@@ -2806,7 +2807,7 @@ button {
 
 .phone-story-kicker {
   margin: 0;
-  color: rgba(126, 154, 104, 0.72);
+  color: var(--usco-label-sage);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.24em;
