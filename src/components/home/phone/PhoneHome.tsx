@@ -1,4 +1,3 @@
-import { HomeOfferingStrip } from "@/components/home-offering-strip";
 import { HomeReviewSection } from "@/components/home-review-section";
 import {
   HomeExploreSection,
@@ -6,7 +5,7 @@ import {
   HomePillarsSection,
 } from "@/components/home/shared/home-sections";
 import { MotionInView } from "@/components/home/shared/motion-in-view";
-import { googleReviewCta, homeOfferingStripItems } from "@/data/site";
+import { googleReviewCta } from "@/data/site";
 import { homeIntroContent, phoneTeaserCards } from "../shared/home-content";
 import { PhoneHero } from "./phone-hero";
 
@@ -19,7 +18,6 @@ export default function PhoneHome() {
         body={homeIntroContent.body}
         className="px-4 pb-10 pt-8"
       />
-      <HomeOfferingStrip items={homeOfferingStripItems} />
       <section className="phone-story-section relative px-4 pb-9 pt-4">
         <MotionInView direction="left" delay="0.04s">
           <article className="phone-story-card phone-story-card--coffee relative isolate">
