@@ -24,7 +24,7 @@ export function PhoneHero() {
             style={{ "--motion-delay": "0.05s" } as CSSProperties}
           >
             <img
-              src="/media/Loading%20screen/usco-loading-logo.png"
+              src="/brand/usco-logo.png"
               alt="USCO"
               className="phone-hero-logo-image"
             />

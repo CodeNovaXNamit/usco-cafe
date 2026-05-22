@@ -38,7 +38,13 @@ export function UscoLoader({
   return (
     <div className={className} {...rest}>
       <div className={`site-loading-content ${contentClassName}`.trim()}>
-        <div className={`site-loading-logo ${logoClassName}`.trim()}>USCO</div>
+        <div className={`site-loading-logo ${logoClassName}`.trim()}>
+          <img
+            src="/brand/usco-logo.png"
+            alt="USCO"
+            className="site-loading-logo-image"
+          />
+        </div>
         <p className={`site-loading-tagline ${taglineClassName}`.trim()}>{message}</p>
         <div className={`site-loading-progress ${progressClassName}`.trim()} aria-hidden>
           <div

@@ -21,7 +21,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
           <Link href="/" className="site-brand">
             <span className="site-brand-logo">
               <img
-                src="/media/Loading%20screen/usco-loading-logo.png"
+                src="/brand/usco-logo.png"
                 alt="USCO"
                 className="site-header-logo-image"
               />
@@ -61,7 +61,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
           <div>
             <Link href="/" className="site-footer-logo-badge" aria-label="USCO home">
               <img
-                src="/media/Loading%20screen/usco-loading-logo.png"
+                src="/brand/usco-logo.png"
                 alt="USCO"
                 className="site-footer-logo-image"
               />
