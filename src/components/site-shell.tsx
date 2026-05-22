@@ -19,7 +19,13 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
       <header className={`site-header ${isHomePage ? "site-header--home" : "border-b border-matcha-light/70"}`}>
         <div className="site-header-shell">
           <Link href="/" className="site-brand">
-            <span className="site-brand-logo">USCO</span>
+            <span className="site-brand-logo">
+              <img
+                src="/media/Loading%20screen/usco-loading-logo.png"
+                alt="USCO"
+                className="site-header-logo-image"
+              />
+            </span>
             <span className="site-brand-copy">
               <span>COFFEE+TOAST+WORK</span>
               <em>A slower cup in Shahpur Jat</em>
@@ -53,8 +59,14 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
       <footer className="site-footer relative z-20 mt-16 bg-matcha-deep text-white sm:mt-24">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-10">
           <div>
-            <div className="font-display text-[2.2rem] tracking-[0.08em] sm:text-4xl">USCO</div>
-            <div className="font-accent text-[11px] uppercase tracking-[0.3em] text-matcha-light sm:text-sm sm:tracking-[0.35em]">
+            <Link href="/" className="site-footer-logo-badge" aria-label="USCO home">
+              <img
+                src="/media/Loading%20screen/usco-loading-logo.png"
+                alt="USCO"
+                className="site-footer-logo-image"
+              />
+            </Link>
+            <div className="site-footer-brand-tagline font-accent text-[11px] uppercase tracking-[0.3em] sm:text-sm sm:tracking-[0.35em]">
               COFFEE+TOAST+WORK
             </div>
           </div>
