@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFrameAssetUrl, totalFrames } from "@/data/site";
 import { UscoLoader } from "@/components/usco-loader";
@@ -56,8 +55,6 @@ export function FrameSequenceHero() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const startOverlayRef = useRef<HTMLDivElement | null>(null);
-  const endOverlayRef = useRef<HTMLDivElement | null>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const [loadedCount, setLoadedCount] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
@@ -164,9 +161,7 @@ export function FrameSequenceHero() {
     const section = sectionRef.current;
     const pin = pinRef.current;
     const canvas = canvasRef.current;
-    const startOverlay = startOverlayRef.current;
-    const endOverlay = endOverlayRef.current;
-    if (!section || !pin || !canvas || !startOverlay || !endOverlay) {
+    if (!section || !pin || !canvas) {
       return;
     }
 
@@ -214,29 +209,6 @@ export function FrameSequenceHero() {
       }
 
       drawCoverFrame(canvas, frame);
-
-      const startExit = clamp(nextProgress / 0.14);
-      const startOpacity = 1 - startExit;
-      const startY = -90 * startExit;
-      const startBlur = 8 * startExit;
-      const startScale = 1 - 0.04 * startExit;
-
-      startOverlay.style.opacity = String(startOpacity);
-      startOverlay.style.transform = `translate3d(0, ${startY}px, 0) scale(${startScale})`;
-      startOverlay.style.filter = `blur(${startBlur}px)`;
-      startOverlay.style.pointerEvents = startOpacity > 0.2 ? "auto" : "none";
-
-      const endEnter = clamp((nextProgress - 0.78) / 0.16);
-      const easedEnd = 1 - Math.pow(1 - endEnter, 3);
-      const endOpacity = easedEnd;
-      const endY = 55 * (1 - easedEnd);
-      const endScale = 0.94 + 0.06 * easedEnd;
-      const endBlur = 10 * (1 - easedEnd);
-
-      endOverlay.style.opacity = String(endOpacity);
-      endOverlay.style.transform = `translate3d(0, ${endY}px, 0) scale(${endScale})`;
-      endOverlay.style.filter = `blur(${endBlur}px)`;
-      endOverlay.style.pointerEvents = endOpacity > 0.6 ? "auto" : "none";
     };
 
     const scheduleRender = () => {
@@ -317,38 +289,6 @@ export function FrameSequenceHero() {
           className={`frame-sequence-vignette ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
           aria-hidden="true"
         />
-
-        <div
-          ref={startOverlayRef}
-          className={`frame-sequence-start-overlay ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
-        >
-          <article className="frame-glass-card frame-glass-card--left">
-            <p className="frame-glass-kicker">COFFEE + TOAST + WORK</p>
-            <h2>Somewhere softer than the usual rush.</h2>
-            <p>A calm little stop in Shahpur Jat for slow sips, warm lights, and quiet conversations.</p>
-          </article>
-
-          <article className="frame-glass-card frame-glass-card--right">
-            <p className="frame-glass-kicker">USCO RITUAL</p>
-            <h2>Walk in slow. Leave lighter.</h2>
-            <p>From matcha mornings to evening coffee, the space is made to feel peaceful before the first sip.</p>
-          </article>
-        </div>
-
-        <div
-          ref={endOverlayRef}
-          className={`frame-sequence-end-overlay ${ready ? "frame-sequence-media-ready" : "frame-sequence-media-loading"}`}
-        >
-          <article className="frame-glass-card frame-glass-card--end">
-            <p className="frame-glass-kicker">A LITTLE CUP FOR YOU</p>
-            <h2>Coffee for you.</h2>
-            <p>Hot, iced, creamy, quiet - pick the mood and let the day slow down for a minute.</p>
-            <div className="frame-glass-actions">
-              <Link href="/menu">Explore Menu</Link>
-              <Link href="/find-us">Find Us</Link>
-            </div>
-          </article>
-        </div>
       </div>
     </section>
   );

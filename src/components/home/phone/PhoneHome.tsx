@@ -1,6 +1,7 @@
 import { HomeReviewSection } from "@/components/home-review-section";
 import {
-  HomeExploreSection,
+  HomeFeaturedMenuSection,
+  HomeSecondaryExploreSection,
 } from "@/components/home/shared/home-sections";
 import { MotionInView } from "@/components/home/shared/motion-in-view";
 import { googleReviewCta } from "@/data/site";
@@ -8,9 +9,13 @@ import { phoneTeaserCards } from "../shared/home-content";
 import { PhoneHero } from "./phone-hero";
 
 export default function PhoneHome() {
+  const menuCard = phoneTeaserCards.find((card) => card.title === "Menu");
+  const secondaryExploreCards = phoneTeaserCards.filter((card) => card.title !== "Menu");
+
   return (
     <div className="home-motion-surface">
       <PhoneHero />
+      {menuCard ? <HomeFeaturedMenuSection card={menuCard} className="home-featured-menu--phone" /> : null}
       <section className="phone-story-section relative px-4 pb-9 pt-4">
         <MotionInView direction="right" delay="0.06s">
           <article className="phone-story-card phone-story-card--workspace relative isolate">
@@ -48,13 +53,7 @@ export default function PhoneHome() {
           </article>
         </MotionInView>
       </section>
-      <HomeExploreSection
-        cards={phoneTeaserCards}
-        className="px-4 py-4"
-        cardsClassName="grid gap-4"
-        headingClassName="home-motion-text home-motion-text--drift mt-3 font-display text-[2.4rem] leading-[0.96] text-matcha-deep"
-        showDesktopCta={false}
-      />
+      <HomeSecondaryExploreSection cards={secondaryExploreCards} />
       <HomeReviewSection
         reviewUrl={googleReviewCta.href}
         ratingLabel={googleReviewCta.ratingLabel}

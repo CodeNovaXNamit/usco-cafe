@@ -88,7 +88,6 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
               @uscocafe
             </a>
             <p className="font-sans text-xs uppercase tracking-[0.18em] sm:text-sm sm:tracking-[0.2em]">Open 10am - 8pm</p>
-            <p>No WiFi password. No rush. No. 4.</p>
           </div>
         </div>
         <div className="border-t border-matcha-light/25">

@@ -79,39 +79,25 @@ type ExploreSectionProps = {
   cards: HomeTeaserCard[];
   className?: string;
   cardsClassName?: string;
-  headingClassName?: string;
-  showDesktopCta?: boolean;
+  showHeading?: boolean;
 };
 
 export function HomeExploreSection({
   cards,
   className = "",
   cardsClassName = "home-explore-grid",
-  headingClassName = "home-motion-text home-motion-text--drift",
-  showDesktopCta = true,
+  showHeading = true,
 }: ExploreSectionProps) {
   return (
     <section className={`home-explore-premium ${className}`}>
       <div className="home-explore-shell">
-        <div className="home-explore-heading">
-          <div>
+        {showHeading ? (
+          <div className="home-explore-heading">
             <p className="home-section-kicker home-motion-text home-motion-text--drift" style={{ "--motion-delay": "0.08s" } as CSSProperties}>
               Explore next
             </p>
-            <h2 className={headingClassName} style={{ "--motion-delay": "0.16s" } as CSSProperties}>
-              A few ways in.
-            </h2>
           </div>
-          {showDesktopCta ? (
-            <Link
-              href="/find-us"
-              className="home-motion-text hidden font-sans text-xs uppercase tracking-[0.26em] text-matcha-mid sm:block"
-              style={{ "--motion-delay": "0.24s" } as CSSProperties}
-            >
-              Start where it feels right
-            </Link>
-          ) : null}
-        </div>
+        ) : null}
 
         <div className={cardsClassName}>
           {cards.map((card, index) => (
@@ -152,6 +138,89 @@ export function HomeExploreSection({
             </Link>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+type FeaturedMenuSectionProps = {
+  card: HomeTeaserCard;
+  className?: string;
+};
+
+export function HomeFeaturedMenuSection({ card, className = "" }: FeaturedMenuSectionProps) {
+  return (
+    <section className={`home-featured-menu ${className}`}>
+      <div className="home-featured-menu-media">
+        <Image
+          src={card.image}
+          alt={`${card.title} at USCO Cafe in Shahpur Jat, New Delhi`}
+          width={1200}
+          height={840}
+          sizes="(max-width: 767px) 100vw, 50vw"
+        />
+      </div>
+      <div className="home-featured-menu-copy">
+        <p className="home-featured-menu-kicker">Carefully chosen</p>
+        <h2>Menu</h2>
+        <p>
+          Coffee, toast, matcha, and small comforts served quietly through the day.
+        </p>
+        <Link href="/menu" className="home-featured-menu-button">
+          Explore the menu
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+type SecondaryExploreSectionProps = {
+  cards: HomeTeaserCard[];
+  className?: string;
+};
+
+export function HomeSecondaryExploreSection({ cards, className = "" }: SecondaryExploreSectionProps) {
+  return (
+    <section className={`home-secondary-explore ${className}`}>
+      <div className="home-secondary-explore-header">
+        <p className="home-secondary-explore-kicker">CONTINUE THE VISIT</p>
+        <h2>Map &amp; little moments.</h2>
+        <p>Find the lane, then peek at the corners before you come.</p>
+      </div>
+      <div className="home-secondary-explore-grid">
+        {cards.map((card, index) => (
+          <Link key={card.href} href={card.href} className="group home-explore-card home-secondary-explore-card">
+            <div className="home-explore-media">
+              <Image
+                src={card.image}
+                alt={`${card.title} at USCO Cafe in Shahpur Jat, New Delhi`}
+                fill
+                sizes="(max-width: 1023px) 100vw, 50vw"
+                className="home-explore-image"
+              />
+            </div>
+            <div className="home-explore-content">
+              <h3
+                className="home-motion-text home-motion-text--drift"
+                style={{ "--motion-delay": `${0.12 + index * 0.1}s` } as CSSProperties}
+              >
+                {card.title}
+              </h3>
+              <p
+                className="home-motion-text"
+                style={{ "--motion-delay": `${0.2 + index * 0.1}s` } as CSSProperties}
+              >
+                {card.blurb}
+              </p>
+              <span
+                className="home-motion-text home-explore-cta"
+                style={{ "--motion-delay": `${0.28 + index * 0.1}s` } as CSSProperties}
+              >
+                Explore onward
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
