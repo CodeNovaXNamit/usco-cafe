@@ -164,7 +164,7 @@ export function HomeFeaturedMenuSection({ card, className = "" }: FeaturedMenuSe
         <p className="home-featured-menu-kicker">Carefully chosen</p>
         <h2>Menu</h2>
         <p>
-          Coffee, toast, matcha, and small comforts served quietly through the day.
+          Coffee, Shibuya Toast, Matcha, and small comforts served quietly through the day.
         </p>
         <Link href="/menu" className="home-featured-menu-button">
           Explore the menu
