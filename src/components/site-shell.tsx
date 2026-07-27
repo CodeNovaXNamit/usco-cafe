@@ -9,7 +9,7 @@ type SiteShellProps = {
 };
 
 export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
-  const hasInnerPageBackdrop = ["/menu", "/gallery", "/find-us"].includes(currentPath);
+  const hasInnerPageBackdrop = ["/menu", "/gallery", "/clothing", "/find-us"].includes(currentPath);
   const isHomePage = currentPath === "/";
   const currentYear = new Date().getFullYear();
 
