@@ -94,14 +94,10 @@ export default function ClothingPage() {
 
         <section className="clothing-hero" aria-labelledby="clothing-page-title">
           <div className="clothing-hero-copy section-fade">
-            <p className="clothing-kicker">USCO Collective</p>
             <h1 id="clothing-page-title" className="clothing-hero-title">
               <span>USCO</span>
               <span>COLLECTIVE</span>
             </h1>
-            <p className="clothing-hero-body">
-              Clothing, objects and everyday essentials from the world of USCO.
-            </p>
             <InstagramCta ariaLabel="Explore USCO Collective on Instagram, opens in a new tab">
               Explore on Instagram
             </InstagramCta>
@@ -121,17 +117,6 @@ export default function ClothingPage() {
               Exterior of the USCO Collective clothing store.
             </figcaption>
           </figure>
-        </section>
-
-        <section className="clothing-intro-section" aria-labelledby="clothing-intro-title">
-          <span className="clothing-editorial-rule" aria-hidden="true" />
-          <div className="clothing-intro-copy">
-            <h2 id="clothing-intro-title">A new side of USCO.</h2>
-            <p>
-              An independent clothing space shaped by the same ideas as the cafe&mdash;community,
-              simplicity and thoughtful everyday design.
-            </p>
-          </div>
         </section>
 
         <section className="clothing-instagram-section" aria-labelledby="clothing-instagram-title">

@@ -3871,7 +3871,7 @@ button {
   }
 
   .site-header {
-    padding: 0.55rem 0.75rem;
+    padding: 0.55rem 0.375rem;
   }
 
   .site-header-shell {
@@ -3899,26 +3899,32 @@ button {
   }
 
   .site-nav {
-    width: 100%;
-    max-width: 100%;
+    width: min(100%, calc(100vw - 8px));
+    max-width: calc(100vw - 8px);
     min-width: 0;
     justify-self: stretch;
     display: flex;
-    justify-content: space-between;
-    gap: 0.15rem;
-    padding: 0.22rem;
+    justify-content: center;
+    gap: clamp(4px, 1.6vw, 7px);
+    padding: 0.2rem;
     border-radius: 999px;
+    box-sizing: border-box;
   }
 
   .site-nav a {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: 0 0 auto;
     min-height: 32px;
-    padding: 0 0.35rem;
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
+    padding: 0 clamp(3px, 1.15vw, 6px);
+    font-size: clamp(8px, 2.7vw, 10px);
+    letter-spacing: 0.06em;
     white-space: nowrap;
     text-align: center;
+    box-sizing: border-box;
+  }
+
+  .site-nav a[aria-current="page"],
+  .site-nav a.is-active {
+    padding-inline: clamp(5px, 1.8vw, 8px);
   }
 }
 
@@ -3932,7 +3938,7 @@ button {
   }
 
   .site-header {
-    padding: 0.55rem 0.65rem;
+    padding: 0.55rem 4px;
   }
 
   .site-header-shell {
@@ -3947,25 +3953,31 @@ button {
   }
 
   .site-nav {
-    width: 100%;
-    max-width: 100%;
+    width: min(100%, calc(100vw - 8px));
+    max-width: calc(100vw - 8px);
     min-width: 0;
     display: flex;
-    justify-content: space-between;
-    gap: 0.12rem;
-    padding: 0.22rem;
+    justify-content: center;
+    gap: clamp(4px, 1.6vw, 6px);
+    padding: 3px;
     border-radius: 999px;
+    box-sizing: border-box;
   }
 
   .site-nav a {
-    flex: 1 1 0;
-    min-width: 0;
-    min-height: 34px;
-    padding: 0 0.28rem;
-    font-size: 0.56rem;
-    letter-spacing: 0.1em;
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 clamp(3px, 1vw, 5px);
+    font-size: clamp(8px, 2.65vw, 9px);
+    letter-spacing: 0.055em;
     white-space: nowrap;
     text-align: center;
+    box-sizing: border-box;
+  }
+
+  .site-nav a[aria-current="page"],
+  .site-nav a.is-active {
+    padding-inline: clamp(4px, 1.4vw, 6px);
   }
 
   .phone-hero-logo-image {

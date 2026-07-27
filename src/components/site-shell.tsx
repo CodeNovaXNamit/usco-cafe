@@ -8,6 +8,75 @@ type SiteShellProps = {
   currentPath?: string;
 };
 
+function MobileNavFitStyles() {
+  return (
+    <style>
+      {`
+        @media (max-width: 380px) {
+          .site-header {
+            padding-inline: 0.375rem;
+          }
+
+          .site-nav {
+            width: min(100%, calc(100vw - 8px));
+            max-width: calc(100vw - 8px);
+            min-width: 0;
+            justify-content: center;
+            gap: clamp(4px, 1.6vw, 7px);
+            padding: 0.2rem;
+            box-sizing: border-box;
+          }
+
+          .site-nav a {
+            flex: 0 0 auto;
+            min-height: 32px;
+            padding-inline: clamp(3px, 1.15vw, 6px);
+            font-size: clamp(8px, 2.7vw, 10px);
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+            box-sizing: border-box;
+          }
+
+          .site-nav a[aria-current="page"],
+          .site-nav a.is-active {
+            padding-inline: clamp(5px, 1.8vw, 8px);
+          }
+        }
+
+        @media (max-width: 359px) {
+          .site-header {
+            padding-inline: 4px;
+          }
+
+          .site-nav {
+            width: min(100%, calc(100vw - 8px));
+            max-width: calc(100vw - 8px);
+            justify-content: center;
+            gap: clamp(4px, 1.6vw, 6px);
+            padding: 3px;
+            box-sizing: border-box;
+          }
+
+          .site-nav a {
+            flex: 0 0 auto;
+            min-height: 32px;
+            padding-inline: clamp(3px, 1vw, 5px);
+            font-size: clamp(8px, 2.65vw, 9px);
+            letter-spacing: 0.055em;
+            white-space: nowrap;
+            box-sizing: border-box;
+          }
+
+          .site-nav a[aria-current="page"],
+          .site-nav a.is-active {
+            padding-inline: clamp(4px, 1.4vw, 6px);
+          }
+        }
+      `}
+    </style>
+  );
+}
+
 export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   const hasInnerPageBackdrop = ["/menu", "/gallery", "/clothing", "/find-us"].includes(currentPath);
   const isHomePage = currentPath === "/";
@@ -16,6 +85,7 @@ export function SiteShell({ children, currentPath = "/" }: SiteShellProps) {
   return (
     <div className={`site-shell min-h-screen flex flex-col text-charcoal ${hasInnerPageBackdrop ? "inner-page-shell" : ""}`}>
       <HeaderHeightSync />
+      <MobileNavFitStyles />
       <header className={`site-header ${isHomePage ? "site-header--home" : "border-b border-matcha-light/70"}`}>
         <div className="site-header-shell">
           <Link href="/" className="site-brand">
