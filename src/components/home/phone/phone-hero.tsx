@@ -15,7 +15,7 @@ export function PhoneHero() {
           data-loader-critical
           className="absolute inset-0 h-full w-full object-cover object-center"
         >
-          <source src="/media/phone/hero-video.mp4" type="video/mp4" />
+          <source src="/media/phone/usco-blinikn-2.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,246,241,0.12),rgba(248,246,241,0.02)_34%,rgba(30,30,26,0.34)_100%)]" />
         <div className="phone-hero-brand absolute z-10">
