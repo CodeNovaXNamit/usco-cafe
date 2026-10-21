@@ -21,29 +21,20 @@ const certificates = [
 for (const certificate of certificates) {
   const destination = `${siteUrl}/certificates/${certificate.slug}`;
   const qr = await QRCode.toBuffer(destination, {
-    errorCorrectionLevel: "H",
-    margin: 2,
-    width: 190,
+    errorCorrectionLevel: "M",
+    margin: 4,
+    scale: 4,
     color: {
-      dark: "#1e2c1b",
-      light: "#f8f6f1",
+      dark: "#36432dff",
+      light: "#00000000",
     },
   });
 
-  const qrCard = await sharp({
-    create: {
-      width: 218,
-      height: 218,
-      channels: 4,
-      background: { r: 248, g: 246, b: 241, alpha: 1 },
-    },
-  })
-    .composite([{ input: qr, left: 14, top: 14 }])
-    .png()
-    .toBuffer();
+  const { width: qrWidth } = await sharp(qr).metadata();
 
+  // Inset from the botanical corner so the transparent quiet zone stays clear.
   await sharp(path.join(certificateDir, certificate.source))
-    .composite([{ input: qrCard, left: 1280, top: 42 }])
+    .composite([{ input: qr, left: 1290 - qrWidth, top: 48 }])
     .png()
     .toFile(path.join(certificateDir, certificate.output));
 
