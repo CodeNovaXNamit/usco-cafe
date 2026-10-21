@@ -1,0 +1,56 @@
+.page {
+  min-height: 100vh;
+  padding: 3rem 1.25rem 4rem;
+  background: #1e2c1b;
+  color: #f8f6f1;
+}
+
+.frame {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+}
+
+.eyebrow {
+  margin: 0 0 0.8rem;
+  color: #c8973a;
+  font-family: var(--font-ui), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: #f8f6f1;
+  font-family: var(--font-display), serif;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.note {
+  margin: 0.85rem 0 2rem;
+  color: rgba(248, 246, 241, 0.72);
+  font-family: var(--font-ui), sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.certificate {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(200, 151, 58, 0.4);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 2rem 0.75rem 2.5rem;
+  }
+
+  .note {
+    margin-bottom: 1.25rem;
+  }
+}
